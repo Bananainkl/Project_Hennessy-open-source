@@ -1,0 +1,33 @@
+name: Publish GitHub Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate version and release notes
+        run: |
+          version="$(tr -d '[:space:]' < VERSION)"
+          build="$(tr -d '[:space:]' < BUILD_NUMBER)"
+          test "${GITHUB_REF_NAME}" = "v${version}"
+          test -s RELEASE_NOTES.md
+          grep -Fq "${version}" RELEASE_NOTES.md
+          grep -Fq "## ${version} (${build})" CHANGELOG.md
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            --verify-tag \
+            --title "Hennessy ${GITHUB_REF_NAME}" \
+            --notes-file RELEASE_NOTES.md

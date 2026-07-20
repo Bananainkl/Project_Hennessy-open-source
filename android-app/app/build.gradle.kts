@@ -11,8 +11,8 @@ android {
         applicationId = "com.bluelion.hennessy"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = rootProject.file("../BUILD_NUMBER").readText().trim().toInt()
+        versionName = rootProject.file("../VERSION").readText().trim()
 
         ndk {
             abiFilters += listOf("arm64-v8a")

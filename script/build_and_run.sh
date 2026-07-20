@@ -4,11 +4,11 @@ set -euo pipefail
 MODE="${1:-run}"
 APP_NAME="Hennessy"
 BUNDLE_ID="com.local.Hennessy"
-APP_VERSION="1.7.11"
-APP_BUILD="181"
 MIN_SYSTEM_VERSION="14.0"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+APP_VERSION="$(tr -d '[:space:]' < "$ROOT_DIR/VERSION")"
+APP_BUILD="$(tr -d '[:space:]' < "$ROOT_DIR/BUILD_NUMBER")"
 DIST_DIR="$ROOT_DIR/dist"
 APP_BUNDLE="$DIST_DIR/$APP_NAME.app"
 APP_CONTENTS="$APP_BUNDLE/Contents"

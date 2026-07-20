@@ -2,9 +2,9 @@
 set -euo pipefail
 
 APP_NAME="Hennessy"
-VERSION="${VERSION:-1.7.11}"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+VERSION="${VERSION:-$(tr -d '[:space:]' < "$ROOT_DIR/VERSION")}"
 DIST_DIR="$ROOT_DIR/dist"
 APP_BUNDLE="$DIST_DIR/$APP_NAME.app"
 DMG_ROOT="$DIST_DIR/dmg-root"
