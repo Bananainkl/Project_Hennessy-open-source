@@ -1,0 +1,24 @@
+Bundled command line tools used by Hennessy
+
+yt-dlp
+- Source: https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos
+- Version included: 2026.06.09
+- Project: https://github.com/yt-dlp/yt-dlp
+- License: The Unlicense (see https://github.com/yt-dlp/yt-dlp/blob/master/LICENSE)
+
+ffmpeg
+- Source package: imageio-ffmpeg 0.6.0 macOS arm64 wheel
+- Bundled binary: imageio_ffmpeg/binaries/ffmpeg-macos-aarch64-v7.1
+- Project: https://github.com/imageio/imageio-ffmpeg
+- FFmpeg project: https://ffmpeg.org/
+- License: depends on the exact FFmpeg build configuration. Verify whether the
+  distributed binary is LGPL or GPL and provide all required notices and source
+  information. See https://ffmpeg.org/legal.html.
+
+Android
+- youtubedl-android library and ffmpeg artifacts: 0.18.1
+- Project: https://github.com/yausername/youtubedl-android
+- License: GNU General Public License v3.0
+
+The app prepends Contents/Resources/Tools to PATH at runtime, then falls back
+to common Homebrew and system paths.
