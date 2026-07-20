@@ -1,6 +1,34 @@
 # Hennessy
 
-Hennessy is a native media downloader, library, and player for macOS, with an experimental native Android companion app.
+<p align="center">
+  <img src="docs/images/social-preview.jpg" alt="Hennessy — native media library for macOS and Android" width="100%">
+</p>
+
+<p align="center">
+  <a href="#quick-start"><strong>Quick Start</strong></a> ·
+  <a href="https://github.com/Bananainkl/Project_Hennessy-open-source/releases">Releases</a> ·
+  <a href="https://github.com/Bananainkl/Project_Hennessy-open-source/issues">Issues</a> ·
+  <a href="https://github.com/Bananainkl/Project_Hennessy-open-source/discussions">Discussions</a>
+</p>
+
+<p align="center">
+  <img alt="GPL-3.0" src="https://img.shields.io/badge/license-GPL--3.0-f97316">
+  <img alt="Swift" src="https://img.shields.io/badge/Swift-native-f05138?logo=swift&logoColor=white">
+  <img alt="macOS 14+" src="https://img.shields.io/badge/macOS-14%2B-111827?logo=apple">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-22_passing-22c55e">
+  <img alt="GitHub stars" src="https://img.shields.io/github/stars/Bananainkl/Project_Hennessy-open-source?style=flat">
+</p>
+
+Hennessy is a native media downloader, local library, and player for macOS, with an experimental Android companion. It combines download planning, searchable local media, metadata, lyrics, playlists, and playback in one SwiftUI workspace.
+
+## Why Hennessy
+
+- **One native workflow** from a supported media URL to an organized local library.
+- **Library-first design** with metadata editing, artwork, lyrics, duplicate detection, and resume state.
+- **Transparent tooling**: large third-party executables stay out of source history and are documented explicitly.
+- **Tested core policies** for playlist planning, duplicate matching, lyrics, artwork, and playback resume.
+
+> Hennessy does not include downloaded media, `yt-dlp`, or FFmpeg binaries in this repository. You are responsible for using supported services and media in accordance with applicable terms and law.
 
 ## Features
 
@@ -21,6 +49,16 @@ Downloaded files are saved to `~/Downloads/Media` by default. The packaged macOS
 
 ```bash
 brew install yt-dlp ffmpeg
+```
+
+## Quick Start
+
+```bash
+git clone https://github.com/Bananainkl/Project_Hennessy-open-source.git
+cd Project_Hennessy-open-source
+brew install yt-dlp ffmpeg
+swift test
+./script/build_and_run.sh
 ```
 
 ## Build and Run
