@@ -5,10 +5,10 @@
 </p>
 
 <p align="center">
-  <a href="#quick-start"><strong>Quick Start</strong></a> ·
-  <a href="https://github.com/Bananainkl/Project_Hennessy-open-source/releases">Releases</a> ·
-  <a href="https://github.com/Bananainkl/Project_Hennessy-open-source/issues">Issues</a> ·
-  <a href="https://github.com/Bananainkl/Project_Hennessy-open-source/discussions">Discussions</a>
+  <a href="#quick-start"><strong>快速开始 / Quick Start</strong></a> ·
+  <a href="https://github.com/Bananainkl/Project_Hennessy-open-source/releases">版本发布 / Releases</a> ·
+  <a href="https://github.com/Bananainkl/Project_Hennessy-open-source/issues">问题与建议 / Issues</a> ·
+  <a href="https://github.com/Bananainkl/Project_Hennessy-open-source/discussions">讨论区 / Discussions</a>
 </p>
 
 <p align="center">
@@ -18,6 +18,19 @@
   <img alt="Tests" src="https://img.shields.io/badge/tests-22_passing-22c55e">
   <img alt="GitHub stars" src="https://img.shields.io/github/stars/Bananainkl/Project_Hennessy-open-source?style=flat">
 </p>
+
+## 中文简介
+
+Hennessy 是一款原生 macOS 媒体下载、管理与播放工具，并提供实验性的 Android 配套应用。它把下载规划、可搜索的本地媒体库、元数据、歌词、播放列表和播放控制整合到一个 SwiftUI 工作空间中。
+
+- 从受支持的媒体链接到本地资料库，提供连贯的原生工作流。
+- 支持元数据编辑、封面、歌词、重复项目识别与断点续播。
+- 可检查本地音频编码和有效码率，并在质量确实提升时安全地重新下载。
+- 第三方大型工具不会进入源码历史，其准备方式和许可证边界均有明确说明。
+
+> 本仓库不包含下载的媒体、`yt-dlp` 或 FFmpeg 二进制文件。使用者必须遵守相关服务条款、版权和当地法律。
+
+## English Overview
 
 Hennessy is a native media downloader, local library, and player for macOS, with an experimental Android companion. It combines download planning, searchable local media, metadata, lyrics, playlists, and playback in one SwiftUI workspace.
 
