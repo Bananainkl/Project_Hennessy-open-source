@@ -59,6 +59,7 @@ struct PlayerView: View {
                 MediaListView(
                     items: store.visibleLibraryItems,
                     selectedID: store.selectedLibraryItemID,
+                    qualityForItem: { store.audioQuality(for: $0) },
                     select: { store.selectLibraryItem($0) },
                     toggleFavorite: { store.toggleFavorite($0) },
                     refreshArtwork: { store.refreshArtwork(for: $0) },
@@ -101,6 +102,7 @@ struct RecentPlayedView: View {
                 MediaListView(
                     items: store.recentlyPlayedItems,
                     selectedID: store.selectedLibraryItemID,
+                    qualityForItem: { store.audioQuality(for: $0) },
                     select: { store.selectLibraryItem($0) },
                     toggleFavorite: { store.toggleFavorite($0) },
                     refreshArtwork: { store.refreshArtwork(for: $0) },

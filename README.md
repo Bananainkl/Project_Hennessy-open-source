@@ -37,9 +37,13 @@ Hennessy is a native media downloader, local library, and player for macOS, with
 - Maintain a local media library with artwork, lyrics, metadata editing, and duplicate detection
 - Resume playback and manage playlists from a native SwiftUI interface
 - Inspect download progress, history, and activity logs
+- Audit local audio by codec and effective bitrate
+- Safely re-download low-quality audio only when the candidate is measurably better, while retaining a recoverable backup
 - Build an arm64 Android app for recent Samsung/Android devices
 
 Downloaded files are saved to `~/Downloads/Media` by default. The packaged macOS app prefers tools placed under `Assets/Tools/` and falls back to common Homebrew locations during local development. The large third-party executables are not committed to Git.
+
+The macOS app audits local audio automatically. Files below 120 kbps are marked as needing improvement, while MP3 files are identified as lossy compatibility conversions rather than higher-quality sources. In Settings, **Safe Re-download Low-Quality Files** checks the source again and replaces a file only when the candidate reaches at least 120 kbps and improves by at least 20% or 16 kbps. Original files are moved to a timestamped `Hennessy Quality Backups` folder beside the media library.
 
 ## Requirements
 

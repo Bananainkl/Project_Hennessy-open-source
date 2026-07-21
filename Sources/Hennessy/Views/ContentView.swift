@@ -121,6 +121,9 @@ struct ContentView: View {
             }
         }
         .tint(HennessyDesign.ColorToken.accent)
+        .task {
+            store.startAudioQualityAuditIfNeeded()
+        }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.clear)
     }

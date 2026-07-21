@@ -138,7 +138,7 @@ enum class DownloadMode(
     val icon: ImageVector
 ) {
     BestAudio("最高质量音频", "保留源站提供的最佳音频格式", Icons.Rounded.GraphicEq),
-    Mp3("MP3", "转换为高质量 MP3，兼容性更好", Icons.Rounded.MusicNote),
+    Mp3("MP3", "有损转换为 MP3，仅用于兼容旧设备", Icons.Rounded.MusicNote),
     Video("原质量视频", "最高质量视频与音频，默认 MKV", Icons.Rounded.Movie),
     VideoMp4("MP4 视频", "最高质量视频与音频，转换为可播放 MP4", Icons.Rounded.Movie);
 }

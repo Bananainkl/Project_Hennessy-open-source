@@ -27,6 +27,7 @@ final class DownloaderService: @unchecked Sendable {
     private let processLock = NSLock()
     private var activeProcess: Process?
     private let fileManager = FileManager.default
+    private let audioQualityService = AudioQualityService()
 
     func cancel() {
         processLock.lock()
@@ -46,8 +47,15 @@ final class DownloaderService: @unchecked Sendable {
         try await requireCommand("ffmpeg")
 
         onOutput("开始下载，请稍等……\n")
-        let info = try await mediaInfo(for: request.url, allowPlaylist: request.allowPlaylist)
+        let info = try await mediaInfo(for: request.url, allowPlaylist: request.allowPlaylist, mode: request.mode)
         let metadata = MediaMetadata(info: info, titleOverride: request.titleOverride, artistOverride: request.artistOverride)
+        if request.mode == .bestAudio || request.mode == .mp3,
+           let candidate = RemoteAudioCandidate.parse(info: info) {
+            onOutput("来源音质：\(candidate.description)\n")
+            if candidate.isBelowImprovementThreshold {
+                onOutput("提示：源站当前只提供低于 120 kbps 的音轨，文件不会因转码而获得更多细节。\n")
+            }
+        }
 
         try fileManager.createDirectory(at: request.outputDirectory, withIntermediateDirectories: true)
         let tempDirectory = try makeTemporaryDirectory()
@@ -81,6 +89,10 @@ final class DownloaderService: @unchecked Sendable {
 
         onOutput("\(finalURL.path)\n")
         onOutput("下载完成：\(finalURL.path)\n")
+        if request.mode == .bestAudio || request.mode == .mp3,
+           let quality = try? await audioQualityService.inspect(fileURL: finalURL) {
+            onOutput("文件核验：\(quality.qualityDescription)\n")
+        }
 
         return DownloadResult(
             exitCode: 0,
@@ -99,8 +111,8 @@ final class DownloaderService: @unchecked Sendable {
         }
     }
 
-    private func mediaInfo(for url: String, allowPlaylist: Bool) async throws -> [String: Any] {
-        var arguments = ["yt-dlp", "--dump-single-json", "--no-warnings"]
+    private func mediaInfo(for url: String, allowPlaylist: Bool, mode: DownloadMode) async throws -> [String: Any] {
+        var arguments = ["yt-dlp", "--dump-single-json", "--no-warnings", "-f", formatSelector(for: mode)]
         if !allowPlaylist {
             arguments.append("--no-playlist")
         }
@@ -125,6 +137,13 @@ final class DownloaderService: @unchecked Sendable {
             throw error
         } catch {
             throw DownloaderError.invalidMetadata(error.localizedDescription)
+        }
+    }
+
+    private func formatSelector(for mode: DownloadMode) -> String {
+        switch mode {
+        case .bestAudio, .mp3: "ba/b"
+        case .video, .videoMP4: "bv*+ba/b"
         }
     }
 

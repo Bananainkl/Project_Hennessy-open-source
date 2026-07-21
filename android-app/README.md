@@ -2,6 +2,8 @@
 
 Native Android port of the macOS Hennessy downloader/player.
 
+Android and macOS share the root `VERSION` and `BUILD_NUMBER` values. MP3 remains available only as a lossy compatibility conversion; use Best Audio to preserve the best format exposed by the source.
+
 ## Build APK
 
 ```bash

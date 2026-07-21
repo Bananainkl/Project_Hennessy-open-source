@@ -14,7 +14,7 @@ VOLUME_NAME="$APP_NAME"
 
 cd "$ROOT_DIR"
 
-"$ROOT_DIR/script/build_and_run.sh" --build-only
+SWIFT_CONFIGURATION=release "$ROOT_DIR/script/build_and_run.sh" --build-only
 
 codesign --force --deep --sign - "$APP_BUNDLE" >/dev/null
 

@@ -21,7 +21,7 @@ enum DownloadMode: String, CaseIterable, Identifiable {
     var subtitle: String {
         switch self {
         case .bestAudio: "保留源站提供的最佳音频格式"
-        case .mp3: "转换为高质量 MP3，兼容性更好"
+        case .mp3: "有损转换为 MP3，仅用于兼容旧设备"
         case .video: "最高质量视频与音频，默认 MKV"
         case .videoMP4: "最高质量视频与音频，转换为可播放 MP4"
         }

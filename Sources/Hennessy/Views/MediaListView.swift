@@ -3,6 +3,7 @@ import SwiftUI
 struct MediaListView: View {
     let items: [LibraryMediaItem]
     let selectedID: String?
+    let qualityForItem: (LibraryMediaItem) -> AudioQualityInfo?
     let select: (LibraryMediaItem) -> Void
     let toggleFavorite: (LibraryMediaItem) -> Void
     let refreshArtwork: (LibraryMediaItem) -> Void
@@ -16,6 +17,7 @@ struct MediaListView: View {
                 ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
                     MediaListItemView(
                         item: item,
+                        quality: qualityForItem(item),
                         isSelected: selectedID == item.id,
                         isLast: index == items.count - 1,
                         select: { select(item) },
@@ -42,6 +44,7 @@ struct MediaListView: View {
 
 private struct MediaListItemView: View {
     let item: LibraryMediaItem
+    let quality: AudioQualityInfo?
     let isSelected: Bool
     let isLast: Bool
     let select: () -> Void
@@ -76,6 +79,16 @@ private struct MediaListItemView: View {
             }
 
             Spacer(minLength: 18)
+
+            if let quality, item.isAudio {
+                Text(quality.qualityDescription)
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(qualityBadgeColor(quality))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(qualityBadgeColor(quality).opacity(0.12), in: Capsule())
+                    .help(quality.compactDescription)
+            }
 
             Button(action: edit) {
                 Image(systemName: "pencil")
@@ -127,6 +140,15 @@ private struct MediaListItemView: View {
             withAnimation(.smooth(duration: 0.14)) {
                 isHovered = hovering
             }
+        }
+    }
+
+    private func qualityBadgeColor(_ quality: AudioQualityInfo) -> Color {
+        if quality.isLikelyTranscoded { return .orange }
+        switch quality.tier {
+        case .needsImprovement: return .red
+        case .standard: return HennessyDesign.ColorToken.textSecondary
+        case .highBitrate: return .green
         }
     }
 }

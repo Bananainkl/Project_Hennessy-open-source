@@ -11,9 +11,11 @@ ffmpeg
 - Bundled binary: imageio_ffmpeg/binaries/ffmpeg-macos-aarch64-v7.1
 - Project: https://github.com/imageio/imageio-ffmpeg
 - FFmpeg project: https://ffmpeg.org/
-- License: depends on the exact FFmpeg build configuration. Verify whether the
-  distributed binary is LGPL or GPL and provide all required notices and source
-  information. See https://ffmpeg.org/legal.html.
+- FFmpeg source: https://ffmpeg.org/releases/ffmpeg-7.1.tar.xz
+- License reported by the packaged binary: GNU General Public License version 2
+  or later. The build enables GPL components, including libx264 and libx265.
+- Build configuration and license text can be inspected with `ffmpeg -version`
+  and `ffmpeg -L`. See https://ffmpeg.org/legal.html before redistribution.
 
 Android
 - youtubedl-android library and ffmpeg artifacts: 0.18.1

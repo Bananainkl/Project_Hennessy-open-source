@@ -55,8 +55,16 @@ final class DownloadStore {
     var lyricsState: LyricsLoadState = .idle
     var editingLibraryItem: LibraryMediaItem?
     var isArtworkRefreshRunning = false
+    var audioQualityByItemID: [String: AudioQualityInfo] = [:]
+    var isAudioQualityAuditRunning = false
+    var audioQualityAuditProgress: Double?
+    var audioQualityStatusMessage = "尚未检测资料库音质"
+    var isAudioQualityUpgradeRunning = false
+    var audioQualityUpgradeSummary: String?
 
     private let service = DownloaderService()
+    private let audioQualityService = AudioQualityService()
+    private let audioQualityUpgradeInstaller = AudioQualityUpgradeInstaller()
     private let searchService = MediaSearchService()
     private let lyricsService = LyricsService()
     private let artworkService = ArtworkLookupService()
@@ -138,6 +146,153 @@ final class DownloadStore {
 
     var hasRefreshableArtworkItems: Bool {
         libraryItems.contains { $0.isAudio }
+    }
+
+    var auditedAudioCount: Int {
+        libraryItems.filter { $0.isAudio && audioQualityByItemID[$0.id] != nil }.count
+    }
+
+    var audioItemsNeedingImprovement: [LibraryMediaItem] {
+        libraryItems.filter { item in
+            guard item.isAudio, let quality = audioQualityByItemID[item.id] else { return false }
+            return quality.tier == .needsImprovement
+        }
+    }
+
+    var transcodedMP3Count: Int {
+        libraryItems.reduce(into: 0) { count, item in
+            if audioQualityByItemID[item.id]?.isLikelyTranscoded == true { count += 1 }
+        }
+    }
+
+    var canUpgradeLowQualityAudio: Bool {
+        !isRunning && !isAudioQualityAuditRunning && !isAudioQualityUpgradeRunning && !audioItemsNeedingImprovement.isEmpty
+    }
+
+    func audioQuality(for item: LibraryMediaItem) -> AudioQualityInfo? {
+        audioQualityByItemID[item.id]
+    }
+
+    func startAudioQualityAuditIfNeeded() {
+        guard audioQualityByItemID.isEmpty else { return }
+        startAudioQualityAudit()
+    }
+
+    func startAudioQualityAudit() {
+        guard !isAudioQualityAuditRunning, !isRunning else { return }
+        let items = libraryItems.filter { $0.isAudio && $0.existsOnDisk }
+        guard !items.isEmpty else {
+            audioQualityStatusMessage = "资料库中没有可检测的音频"
+            return
+        }
+        isAudioQualityAuditRunning = true
+        audioQualityAuditProgress = 0
+        audioQualityUpgradeSummary = nil
+        audioQualityStatusMessage = "正在检测 0/\(items.count)"
+        Task { [audioQualityService] in
+            var succeeded = 0
+            var failed = 0
+            for (index, item) in items.enumerated() {
+                do {
+                    audioQualityByItemID[item.id] = try await audioQualityService.inspect(fileURL: item.fileURL)
+                    succeeded += 1
+                } catch {
+                    failed += 1
+                }
+                audioQualityAuditProgress = Double(index + 1) / Double(items.count)
+                audioQualityStatusMessage = "正在检测 \(index + 1)/\(items.count)"
+            }
+            isAudioQualityAuditRunning = false
+            audioQualityAuditProgress = 1
+            let failureText = failed == 0 ? "" : "，\(failed) 首无法识别"
+            audioQualityStatusMessage = "已检测 \(succeeded) 首\(failureText)"
+        }
+    }
+
+    func upgradeLowQualityAudio() {
+        guard canUpgradeLowQualityAudio else { return }
+        let items = audioItemsNeedingImprovement
+        guard !items.isEmpty else { return }
+        isRunning = true
+        isAudioQualityUpgradeRunning = true
+        audioQualityUpgradeSummary = nil
+        errorSummary = nil
+        downloadProgress = 0
+        progressDetail = "0/\(items.count)"
+        statusMessage = "正在安全重下低音质文件"
+        logText = "开始音质改善，共 \(items.count) 首。原文件只会在候选文件通过核验后移入备份目录。\n"
+        Task { [audioQualityService] in
+            var upgraded = 0
+            var unchanged = 0
+            var failed = 0
+            var skipped = 0
+            for (index, snapshot) in items.enumerated() {
+                guard isRunning else { break }
+                guard let item = libraryItems.first(where: { $0.id == snapshot.id }),
+                      let originalQuality = audioQualityByItemID[item.id]
+                else {
+                    skipped += 1
+                    continue
+                }
+                progressDetail = "\(index + 1)/\(items.count)"
+                downloadProgress = Double(index) / Double(items.count)
+                appendLog("\n[\(index + 1)/\(items.count)] \(item.title)\n")
+                if playerController.currentItemID == item.id {
+                    skipped += 1
+                    appendLog("正在播放，已安全跳过。\n")
+                    continue
+                }
+                guard !item.sourceURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                    skipped += 1
+                    appendLog("缺少来源链接，已跳过。\n")
+                    continue
+                }
+                let temporaryDirectory = FileManager.default.temporaryDirectory
+                    .appendingPathComponent("HennessyQualityUpgrade-\(UUID().uuidString)", isDirectory: true)
+                do {
+                    try FileManager.default.createDirectory(at: temporaryDirectory, withIntermediateDirectories: true)
+                    defer { try? FileManager.default.removeItem(at: temporaryDirectory) }
+                    let request = DownloadRequest(
+                        url: item.sourceURL,
+                        outputDirectory: temporaryDirectory,
+                        mode: .bestAudio,
+                        titleOverride: item.title,
+                        artistOverride: item.artist ?? "",
+                        allowPlaylist: false,
+                        thumbnailURL: item.sourceThumbnailURL ?? item.thumbnailURL
+                    )
+                    let result = try await service.download(request: request) { [weak self] chunk in
+                        Task { @MainActor in self?.appendLog(chunk) }
+                    }
+                    guard result.succeeded, let candidateURL = result.finalURL else {
+                        failed += 1
+                        appendLog("候选文件下载失败，原文件保持不变。\n")
+                        continue
+                    }
+                    let candidateQuality = try await audioQualityService.inspect(fileURL: candidateURL)
+                    guard candidateQuality.isMeaningfullyBetter(than: originalQuality) else {
+                        unchanged += 1
+                        appendLog("候选为 \(candidateQuality.compactDescription)，未达到安全替换条件，原文件保持不变。\n")
+                        continue
+                    }
+                    let replacement = try installQualityUpgrade(for: item, candidateURL: candidateURL, candidateQuality: candidateQuality)
+                    upgraded += 1
+                    appendLog("已提升：\(originalQuality.compactDescription) → \(candidateQuality.compactDescription)\n")
+                    appendLog("新文件：\(replacement.filePath)\n")
+                } catch {
+                    failed += 1
+                    appendLog("改善失败：\(error.localizedDescription)。原文件保持不变。\n")
+                }
+            }
+            let wasCancelled = !isRunning
+            isRunning = false
+            isAudioQualityUpgradeRunning = false
+            downloadProgress = wasCancelled ? nil : 1
+            progressDetail = "提升 \(upgraded)，保持 \(unchanged)，跳过 \(skipped)，失败 \(failed)"
+            audioQualityUpgradeSummary = progressDetail
+            statusMessage = wasCancelled ? "音质改善已停止" : "音质改善完成"
+            errorSummary = failed == 0 ? nil : "\(failed) 首处理失败，原文件均已保留。"
+        }
     }
 
     func chooseOutputDirectory() {
@@ -542,6 +697,7 @@ final class DownloadStore {
 
     func removeFromLibrary(_ item: LibraryMediaItem) {
         libraryItems.removeAll { $0.id == item.id }
+        audioQualityByItemID[item.id] = nil
         if selectedLibraryItemID == item.id {
             selectedLibraryItemID = visibleLibraryItems.first?.id
         }
@@ -786,6 +942,7 @@ final class DownloadStore {
     func cancelDownload() {
         service.cancel()
         isRunning = false
+        isAudioQualityUpgradeRunning = false
         statusMessage = "已停止"
         errorSummary = nil
         downloadProgress = nil
@@ -878,6 +1035,36 @@ final class DownloadStore {
         selectedLibraryItemID = item.id
         LibraryPersistence.save(libraryItems)
         refreshArtwork(for: item.id)
+        inspectAudioQuality(for: item.id)
+    }
+
+    private func inspectAudioQuality(for itemID: String) {
+        guard let item = libraryItems.first(where: { $0.id == itemID }), item.isAudio, item.existsOnDisk else { return }
+        Task { [audioQualityService] in
+            guard let quality = try? await audioQualityService.inspect(fileURL: item.fileURL) else { return }
+            guard libraryItems.contains(where: { $0.id == itemID }) else { return }
+            audioQualityByItemID[itemID] = quality
+        }
+    }
+
+    private func installQualityUpgrade(
+        for item: LibraryMediaItem,
+        candidateURL: URL,
+        candidateQuality: AudioQualityInfo
+    ) throws -> LibraryMediaItem {
+        guard let index = libraryItems.firstIndex(where: { $0.id == item.id }) else {
+            throw CocoaError(.fileNoSuchFile)
+        }
+        let installation = try audioQualityUpgradeInstaller.install(item: libraryItems[index], candidateURL: candidateURL)
+        let replacement = installation.replacement
+        let priorID = libraryItems[index].id
+        libraryItems[index] = replacement
+        libraryItems.sort { $0.addedAt > $1.addedAt }
+        if selectedLibraryItemID == priorID { selectedLibraryItemID = replacement.id }
+        audioQualityByItemID[priorID] = nil
+        audioQualityByItemID[replacement.id] = candidateQuality
+        LibraryPersistence.save(libraryItems)
+        return replacement
     }
 
     private func refreshArtwork(for itemID: String) {

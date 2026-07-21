@@ -5,6 +5,12 @@ MODE="${1:-run}"
 APP_NAME="Hennessy"
 BUNDLE_ID="com.local.Hennessy"
 MIN_SYSTEM_VERSION="14.0"
+SWIFT_CONFIGURATION="${SWIFT_CONFIGURATION:-debug}"
+
+if [[ "$SWIFT_CONFIGURATION" != "debug" && "$SWIFT_CONFIGURATION" != "release" ]]; then
+  echo "SWIFT_CONFIGURATION must be debug or release" >&2
+  exit 2
+fi
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 APP_VERSION="$(tr -d '[:space:]' < "$ROOT_DIR/VERSION")"
@@ -23,8 +29,8 @@ cd "$ROOT_DIR"
 
 pkill -x "$APP_NAME" >/dev/null 2>&1 || true
 
-swift build
-BIN_PATH="$(swift build --show-bin-path)"
+swift build -c "$SWIFT_CONFIGURATION"
+BIN_PATH="$(swift build -c "$SWIFT_CONFIGURATION" --show-bin-path)"
 BUILD_BINARY="$BIN_PATH/$APP_NAME"
 
 rm -rf "$APP_BUNDLE"
