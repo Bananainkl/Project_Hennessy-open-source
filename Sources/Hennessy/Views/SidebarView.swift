@@ -33,11 +33,6 @@ struct SidebarView: View {
             SidebarGlassBackground()
             .ignoresSafeArea(.container, edges: [.top, .bottom])
         }
-        .overlay(alignment: .trailing) {
-            Rectangle()
-                .fill(HennessyDesign.ColorToken.separator)
-                .frame(width: 0.7)
-        }
     }
 
     private var header: some View {

@@ -1,13 +1,13 @@
-# Hennessy 1.7.16
+# Hennessy 1.7.17
 
-This release makes the macOS sidebar part of the window layout instead of presenting it as a floating panel.
+This release improves the proportions and flexibility of the macOS navigation and playback layout.
 
 ## Highlights
 
-- The sidebar now sits flush against the window edges and connects directly to the bottom player.
-- The bottom player spans the entire window, including the sidebar area.
-- Sidebar branding and navigation groups are denser and closer to familiar desktop music apps.
-- A dedicated toolbar button keeps the sidebar collapsible.
-- Desktop Transparency preserves visible background texture with a dark contrast layer for readable controls.
+- Drag the sidebar's trailing edge to resize it between 188 and 360 points.
+- Sidebar width persists across launches, and double-clicking the resize edge restores the 195-point default.
+- The permanent vertical separator is gone; the resize indicator appears only while hovering over the edge.
+- The bottom player is one-sixth taller for more comfortable control spacing.
+- Desktop Transparency now gives the bottom player a visible frosted-glass surface instead of an opaque black fill.
 
 Download, library, playback, keyboard shortcut, and accessibility behavior is unchanged.

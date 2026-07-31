@@ -1,8 +1,10 @@
+import AppKit
 import SwiftUI
 
 struct ContentView: View {
     @Bindable var store: DownloadStore
     @AppStorage("windowAppearanceStyle") private var windowAppearanceStyle = WindowAppearanceStyle.glass
+    @AppStorage("sidebarWidth") private var sidebarWidth = Double(HennessyDesign.Component.sidebarIdealWidth)
     @State private var isSidebarVisible = true
 
     var body: some View {
@@ -15,7 +17,12 @@ struct ContentView: View {
             HStack(spacing: 0) {
                 if isSidebarVisible {
                     SidebarView(selection: $store.selectedSection)
-                        .frame(width: HennessyDesign.Component.sidebarIdealWidth)
+                        .frame(width: clampedSidebarWidth)
+                        .overlay(alignment: .trailing) {
+                            SidebarResizeHandle(width: $sidebarWidth)
+                                .offset(x: 4)
+                        }
+                        .zIndex(1)
                         .transition(.move(edge: .leading).combined(with: .opacity))
                 }
 
@@ -137,6 +144,84 @@ struct ContentView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.clear)
+    }
+
+    private var clampedSidebarWidth: CGFloat {
+        CGFloat(min(
+            max(sidebarWidth, Double(HennessyDesign.Component.sidebarMinWidth)),
+            Double(HennessyDesign.Component.sidebarMaxWidth)
+        ))
+    }
+}
+
+private struct SidebarResizeHandle: View {
+    @Binding var width: Double
+    @State private var dragStartWidth: Double?
+    @State private var isHovered = false
+
+    var body: some View {
+        ZStack {
+            Rectangle()
+                .fill(Color.clear)
+
+            Rectangle()
+                .fill(isHovered ? HennessyDesign.ColorToken.accent.opacity(0.72) : Color.clear)
+                .frame(width: 2)
+        }
+        .frame(width: 8)
+        .contentShape(Rectangle())
+        .gesture(resizeGesture)
+        .highPriorityGesture(
+            TapGesture(count: 2)
+                .onEnded {
+                    width = Double(HennessyDesign.Component.sidebarIdealWidth)
+                }
+        )
+        .onHover { hovering in
+            isHovered = hovering
+            if hovering {
+                NSCursor.resizeLeftRight.push()
+            } else {
+                NSCursor.pop()
+            }
+        }
+        .accessibilityElement()
+        .accessibilityLabel("调整侧栏宽度")
+        .accessibilityValue("\(Int(clampedWidth)) 点")
+        .accessibilityAdjustableAction { direction in
+            switch direction {
+            case .increment:
+                width = clamp(width + 16)
+            case .decrement:
+                width = clamp(width - 16)
+            @unknown default:
+                break
+            }
+        }
+    }
+
+    private var resizeGesture: some Gesture {
+        DragGesture(minimumDistance: 0)
+            .onChanged { value in
+                if dragStartWidth == nil {
+                    dragStartWidth = width
+                }
+                width = clamp((dragStartWidth ?? width) + Double(value.translation.width))
+            }
+            .onEnded { _ in
+                dragStartWidth = nil
+            }
+    }
+
+    private var clampedWidth: Double {
+        clamp(width)
+    }
+
+    private func clamp(_ value: Double) -> Double {
+        min(
+            max(value, Double(HennessyDesign.Component.sidebarMinWidth)),
+            Double(HennessyDesign.Component.sidebarMaxWidth)
+        )
     }
 }
 
@@ -344,12 +429,29 @@ private struct PersistentMiniPlayerBar: View {
 }
 
 private struct MiniPlayerShelfBackground: View {
+    @Environment(\.windowAppearanceStyle) private var appearanceStyle
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+
     var body: some View {
-        Rectangle()
-            .fill(.ultraThinMaterial)
-            .overlay {
-                HennessyDesign.ColorToken.miniPlayerBackground
+        if appearanceStyle == .desktopTransparency && !reduceTransparency {
+            ZStack {
+                Rectangle()
+                    .fill(.ultraThinMaterial)
+                    .opacity(0.62)
+                Color.black.opacity(0.30)
+                LinearGradient(
+                    colors: [Color.white.opacity(0.08), .clear, Color.black.opacity(0.10)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
             }
+        } else {
+            Rectangle()
+                .fill(.ultraThinMaterial)
+                .overlay {
+                    HennessyDesign.ColorToken.miniPlayerBackground
+                }
+        }
     }
 }
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.7.17 (187) - 2026-07-31
+
+- Made the macOS sidebar width adjustable by dragging its trailing edge, with persistence across launches and an accessible adjustment action.
+- Set the default sidebar width to 195 points, added a wider 188-360 point adjustment range, and made double-click restore the default.
+- Removed the permanent sidebar separator while retaining a subtle resize indicator on hover.
+- Increased the full-width bottom player height from 72 to 84 points for more comfortable spacing.
+- Restored a visible frosted-glass treatment to the bottom player in Desktop Transparency mode.
+
 ## 1.7.16 (186) - 2026-07-31
 
 - Replaced the macOS 26 floating navigation sidebar with a flush, inline sidebar that connects directly to the window edges and bottom player.

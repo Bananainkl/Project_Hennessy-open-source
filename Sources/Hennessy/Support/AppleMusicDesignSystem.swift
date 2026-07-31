@@ -88,15 +88,15 @@ enum HennessyDesign {
         static let sidebarHorizontal: CGFloat = 12
         static let miniPlayerHorizontal: CGFloat = 0
         static let miniPlayerBottom: CGFloat = 0
-        static let miniPlayerHeight: CGFloat = 72
+        static let miniPlayerHeight: CGFloat = 84
     }
 
     enum Component {
         static let windowMinimumWidth: CGFloat = 1080
         static let windowMinimumHeight: CGFloat = 700
         static let sidebarMinWidth: CGFloat = 188
-        static let sidebarIdealWidth: CGFloat = 200
-        static let sidebarMaxWidth: CGFloat = 218
+        static let sidebarIdealWidth: CGFloat = 195
+        static let sidebarMaxWidth: CGFloat = 360
         static let sidebarRowHeight: CGFloat = 34
         static let sidebarIconSize: CGFloat = 15
         static let sidebarIconColumn: CGFloat = 18
