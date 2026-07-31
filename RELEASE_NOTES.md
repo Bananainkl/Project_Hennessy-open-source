@@ -1,14 +1,11 @@
-# Hennessy 1.7.17
+# Hennessy 1.7.18
 
-This release improves the proportions and flexibility of the macOS navigation and playback layout.
+This release refines the full-player window controls to match native macOS music apps.
 
 ## Highlights
 
-- Drag the sidebar's trailing edge to resize it between 188 and 360 points.
-- Sidebar width persists across launches, and double-clicking the resize edge restores the 195-point default.
-- The permanent vertical separator is gone; the resize indicator appears only while hovering over the edge.
-- The bottom player is one-sixth taller for more comfortable control spacing.
-- Desktop Transparency now gives the bottom player a visible frosted-glass surface instead of an opaque black fill.
-- Sidebar navigation no longer leaves a persistent blue outline, and the Hennessy brand remains legible over desktop backgrounds.
+- The full player now keeps the native red, yellow, and green window controls visible.
+- The regular app toolbar is hidden in the full player without hiding the window controls.
+- A single down button beside the window controls returns to the compact player, replacing the previous two-button capsule.
 
 Download, library, playback, keyboard shortcut, and accessibility behavior is unchanged.

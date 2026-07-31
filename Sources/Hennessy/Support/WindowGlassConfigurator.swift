@@ -2,6 +2,8 @@ import AppKit
 import SwiftUI
 
 struct WindowGlassConfigurator: NSViewRepresentable {
+    let isFullPlayerPresented: Bool
+
     func makeNSView(context: Context) -> NSView {
         let view = NSView(frame: .zero)
         DispatchQueue.main.async {
@@ -25,6 +27,9 @@ struct WindowGlassConfigurator: NSViewRepresentable {
         window.isOpaque = false
         window.backgroundColor = .clear
         window.titlebarAppearsTransparent = true
+        window.titleVisibility = isFullPlayerPresented ? .hidden : .visible
+        window.toolbar?.isVisible = !isFullPlayerPresented
+        setWindowControlsVisible(in: window)
         window.hasShadow = true
         window.contentMinSize = minimumContentSize
 
@@ -39,5 +44,11 @@ struct WindowGlassConfigurator: NSViewRepresentable {
             width: max(currentContentSize.width, minimumContentSize.width),
             height: max(currentContentSize.height, minimumContentSize.height)
         ))
+    }
+
+    private func setWindowControlsVisible(in window: NSWindow) {
+        [NSWindow.ButtonType.closeButton, .miniaturizeButton, .zoomButton].forEach { buttonType in
+            window.standardWindowButton(buttonType)?.isHidden = false
+        }
     }
 }

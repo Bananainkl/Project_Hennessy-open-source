@@ -309,38 +309,16 @@ private struct PlayerTopControls: View {
 
     var body: some View {
         HStack(alignment: .top) {
-            HStack(spacing: 0) {
-                Button {
-                    withAnimation(.smooth(duration: 0.26)) {
-                        store.isFullPlayerPresented = false
-                    }
-                } label: {
-                    Image(systemName: "chevron.down")
+            Button {
+                withAnimation(.smooth(duration: 0.26)) {
+                    store.isFullPlayerPresented = false
                 }
-                .appleMusicTopIconButton()
-                .help("返回小播放器")
-
-                Rectangle()
-                    .fill(PlayerDesign.ColorToken.separator.opacity(0.46))
-                    .frame(width: 0.7, height: 22)
-
-                Button {
-                    withAnimation(.smooth(duration: 0.26)) {
-                        store.isFullPlayerPresented = false
-                    }
-                } label: {
-                    Image(systemName: "list.bullet.rectangle")
-                }
-                .appleMusicTopIconButton()
-                .help("返回播放列表")
+            } label: {
+                Image(systemName: "chevron.down")
             }
-            .padding(.horizontal, 7)
-            .padding(.vertical, 4)
-            .background(PlayerDesign.ColorToken.glassStrong.opacity(0.82), in: Capsule())
-            .overlay {
-                Capsule()
-                    .strokeBorder(Color.white.opacity(0.20), lineWidth: 0.8)
-            }
+            .appleMusicTopIconButton()
+            .padding(.leading, 54)
+            .help("返回小播放器")
 
             Spacer()
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.7.18 (188) - 2026-07-31
+
+- Kept the native macOS close, minimize, and zoom controls visible in the full player while hiding the standard app toolbar.
+- Replaced the duplicated full-player navigation capsule with a single down button positioned beside the native window controls.
+
 ## 1.7.17 (187) - 2026-07-31
 
 - Made the macOS sidebar width adjustable by dragging its trailing edge, with persistence across launches and an accessible adjustment action.

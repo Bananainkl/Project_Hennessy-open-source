@@ -11,7 +11,10 @@ struct ContentView: View {
         ZStack {
             Color.clear
                 .liquidGlassBackdrop(style: windowAppearanceStyle)
-                .background(WindowGlassConfigurator().frame(width: 0, height: 0))
+                .background(
+                    WindowGlassConfigurator(isFullPlayerPresented: store.isFullPlayerPresented)
+                        .frame(width: 0, height: 0)
+                )
             .ignoresSafeArea()
 
             HStack(spacing: 0) {
@@ -44,7 +47,6 @@ struct ContentView: View {
                 .appleMusicWindowBackground()
                 .navigationTitle(store.isFullPlayerPresented ? "" : store.selectedSection.title)
                 .toolbarBackground(.hidden, for: .windowToolbar)
-                .toolbar(store.isFullPlayerPresented ? .hidden : .visible, for: .windowToolbar)
                 .toolbar {
                     ToolbarItemGroup {
                         Button {
@@ -107,7 +109,6 @@ struct ContentView: View {
                 }
             }
             .toolbarBackground(.hidden, for: .windowToolbar)
-            .toolbar(store.isFullPlayerPresented ? .hidden : .visible, for: .windowToolbar)
             .clearWindowContainerBackground()
             .background(Color.clear)
             .opacity(store.isFullPlayerPresented ? 0 : 1)

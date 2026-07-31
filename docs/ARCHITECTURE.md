@@ -1,6 +1,6 @@
 # Hennessy Architecture
 
-> Last verified from repository structure: 2026-07-30
+> Last verified from repository structure: 2026-07-31
 
 ## System Shape
 
@@ -33,6 +33,7 @@ Media files and local library state belong on the user device and must not enter
 
 - Native implementations are retained on both platforms.
 - The macOS main sidebar uses an explicit collapsible inline layout instead of `NavigationSplitView`, preventing macOS 26 from presenting it as a floating rounded panel and allowing the bottom player to span the full window.
+- The full player hides the standard toolbar through `NSWindow` while preserving native close, minimize, and zoom controls; it must not replace the traffic-light controls with hand-drawn buttons.
 - The macOS window appearance is a persisted user preference. Desktop transparency changes background materials rather than whole-window opacity, retains readable dark controls, and falls back to the classic background when Reduce Transparency is enabled.
 - Large third-party executables are prepared outside Git.
 - Quality replacement is guarded by measurable improvement and recoverable backup.
