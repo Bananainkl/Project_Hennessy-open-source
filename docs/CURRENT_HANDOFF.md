@@ -4,7 +4,7 @@
 
 ---
 
-## 最新更新：2026-07-31 19:13（Asia/Shanghai）
+## 最新更新：2026-07-31 19:18（Asia/Shanghai）
 
 ### 最近完成
 - 修复全屏播放器隐藏工具栏后原生窗口控制上移的问题：记录并恢复主界面的窗口坐标，同时将下拉箭头与交通灯垂直居中对齐。
@@ -22,7 +22,7 @@
 - 在真实窗口中验证桌面透视、经典玻璃和最小窗口宽度。
 
 ### 当前状态
-- 公开源码已同步为 `1.7.19 (189)`，等待提交和 GitHub Release 验证。
+- 公开源码已发布为 `1.7.19 (189)`。
 - 私有/公开 Swift 各 32 项测试、Android 单测/Lint/APK、macOS Release/DMG、凭据路径扫描和精确许可证检查均已通过。
 - GitHub Release 已发布并验证源码归档；DMG 未捆绑第三方工具，未上传二进制附件。
 
@@ -56,6 +56,11 @@
 - `docs/CURRENT_HANDOFF.md`
 
 ### 生产环境变更
+- 公开提交 `0ac8b38` 已推送；注解标签 `v1.7.19` 指向 `0ac8b38`。
+- Release：https://github.com/Bananainkl/Project_Hennessy-open-source/releases/tag/v1.7.19（源码归档发布，无二进制附件）。
+- 已验证 DMG SHA-256：`dc37067a5d5d033d53ce184ba97c52d84058f2d4bf357b0bf5fbb477112f26c8`。
+- 已验证 Debug APK SHA-256：`40dc706829683897e3d72f5780d822b7cc95fba62cd5a6601a607d25a41964b0`，不作为 Release 附件发布。
+- GitHub 源码归档已验证：tar.gz `9a155307e18618d77859720ee0963f8c31b98c671ac65aeea1690f7880bed113`，zip `04e960d6f263a2d77c62c7bec81eb0fd9f3b9599b5cccb9123d5cbf778e2e4ed`。
 - 公开提交 `fe1aadd` 已推送；注解标签 `v1.7.18` 指向 `fe1aadd`。
 - Release：https://github.com/Bananainkl/Project_Hennessy-open-source/releases/tag/v1.7.18（源码归档发布，无二进制附件）。
 - 已验证 DMG SHA-256：`1321f53ee410dbccd0ba95db73f9a4af8ae0d37811ad82434e73d82cb81c5ebd`。
