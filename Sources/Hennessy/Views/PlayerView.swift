@@ -1346,17 +1346,29 @@ private struct AVPlayerContainerView: NSViewRepresentable {
 }
 
 private struct FullPlayerBackdrop: View {
+    @Environment(\.windowAppearanceStyle) private var appearanceStyle
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+
     var body: some View {
-        LinearGradient(
-            colors: [
-                Color(red: 0.46, green: 0.47, blue: 0.49),
-                Color(red: 0.36, green: 0.37, blue: 0.39),
-                Color(red: 0.28, green: 0.29, blue: 0.31)
-            ],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-        .ignoresSafeArea()
+        if appearanceStyle == .desktopTransparency && !reduceTransparency {
+            LinearGradient(
+                colors: [Color.white.opacity(0.04), Color.black.opacity(0.06), Color.black.opacity(0.12)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+        } else {
+            LinearGradient(
+                colors: [
+                    Color(red: 0.46, green: 0.47, blue: 0.49),
+                    Color(red: 0.36, green: 0.37, blue: 0.39),
+                    Color(red: 0.28, green: 0.29, blue: 0.31)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+        }
     }
 }
 

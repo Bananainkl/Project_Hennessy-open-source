@@ -1,13 +1,12 @@
-# Hennessy 1.7.13
+# Hennessy 1.7.14
 
-This release adds a native, optional transparent window skin for macOS.
+This release completes the optional Desktop Transparency skin in the macOS full player.
 
 ## Highlights
 
-- Choose **Classic Glass** or **Desktop Transparency** from Settings > Appearance.
-- Desktop Transparency lets the wallpaper and windows behind Hennessy show through the main content and sidebar.
-- The transparent skin uses a dark, readable control treatment without fading the entire window.
-- Appearance changes apply immediately and remain selected after restarting the app.
-- When macOS Reduce Transparency is enabled, Hennessy automatically uses the clearer Classic Glass background.
+- The full player now lets the wallpaper and windows behind Hennessy show through when Desktop Transparency is selected.
+- Album artwork, the queue, and playback controls retain a subtle contrast layer for readability.
+- Classic Glass keeps its original player backdrop.
+- When macOS Reduce Transparency is enabled, the full player automatically uses the clearer opaque background.
 
 The existing Classic Glass appearance remains the default for current and new users.

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.7.14 (184) - 2026-07-31
+
+- Extended the Desktop Transparency skin to the full player while preserving readable artwork, queue, and playback controls.
+- Kept the original opaque player backdrop for Classic Glass and when macOS Reduce Transparency is enabled.
+
 ## 1.7.13 (183) - 2026-07-31
 
 - Added a user-selectable Desktop Transparency window skin alongside the existing Classic Glass appearance.
