@@ -12,12 +12,12 @@
 - 修复 Android API 26 主题误用 API 27 导航栏属性的问题。
 
 ### 当前状态
-- 公开源码已更新到 `1.7.13 (183)`，待提交、推送、打标签并验证 GitHub Release。
+- 公开源码已发布为 `1.7.13 (183)`。
 - Swift 32 项测试、Android 单测/Lint/APK、macOS Release/DMG、凭据路径扫描和许可证检查均已通过。
 
 ### 下一步
-- 提交并推送公开仓库。
-- 创建 `v1.7.13` 注解标签，验证 GitHub Release，并仅附加已验证的 macOS DMG。
+- 收集桌面透视皮肤在不同壁纸与显示设置下的用户反馈。
+- 如需分发二进制安装包，先登录 `gh`，再上传已验证的 macOS DMG；Android Debug APK 不作为 Release 附件。
 
 ### 阻塞/待确认
 - 无。
@@ -34,7 +34,9 @@
 - `VERSION`、`BUILD_NUMBER`、`CHANGELOG.md`、`RELEASE_NOTES.md` 与项目文档
 
 ### 生产环境变更
-- 尚未发布。已验证 DMG SHA-256：`d46b457be160666eccb6509b0e2f7c3a3f3406b894c568aa8a7db79752e9beb3`。
+- 公开提交 `a19e4ab` 已推送；注解标签 `v1.7.13` 与 GitHub Release 已验证。
+- Release：https://github.com/Bananainkl/Project_Hennessy-open-source/releases/tag/v1.7.13（源码归档发布，无二进制附件）。
+- 已验证 DMG SHA-256：`d46b457be160666eccb6509b0e2f7c3a3f3406b894c568aa8a7db79752e9beb3`。
 - 已验证 Debug APK SHA-256：`7d292e5d065e80af1b205032f2b15b43a7f9b8f83e328066deabb5226277d6a2`，不作为 Release 附件发布。
 
 ---
