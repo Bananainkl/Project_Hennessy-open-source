@@ -318,6 +318,7 @@ private struct PlayerTopControls: View {
             }
             .appleMusicTopIconButton()
             .padding(.leading, 54)
+            .offset(y: -9)
             .help("返回小播放器")
 
             Spacer()

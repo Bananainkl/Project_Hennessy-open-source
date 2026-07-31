@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.7.19 (189) - 2026-07-31
+
+- Kept the native macOS window controls at the same position when entering and leaving the full player.
+- Vertically aligned the full-player down button with the native close, minimize, and zoom controls.
+
 ## 1.7.18 (188) - 2026-07-31
 
 - Kept the native macOS close, minimize, and zoom controls visible in the full player while hiding the standard app toolbar.
