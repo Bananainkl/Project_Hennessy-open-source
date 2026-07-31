@@ -4,7 +4,7 @@
 
 ---
 
-## 最新更新：2026-07-31 16:18（Asia/Shanghai）
+## 最新更新：2026-07-31 16:26（Asia/Shanghai）
 
 ### 最近完成
 - 为贴边侧栏加入 188-360pt 拖动调宽、跨启动持久化、无障碍增减操作和双击复位；按用户确认将默认值设为 195pt。
@@ -20,9 +20,9 @@
 - 在真实窗口中验证桌面透视、经典玻璃和最小窗口宽度。
 
 ### 当前状态
-- 公开源码已同步为 `1.7.17 (187)`，等待提交和 GitHub Release 验证。
+- 公开源码已发布为 `1.7.17 (187)`。
 - 私有/公开 Swift 各 32 项测试、Android 单测/Lint/APK、macOS Release/DMG、凭据路径扫描和精确许可证检查均已通过。
-- GitHub Release 已发布源码归档；已验证 DMG 未捆绑第三方工具，暂未上传二进制附件。
+- GitHub Release 已发布并验证源码归档；DMG 未捆绑第三方工具，未上传二进制附件。
 
 ### 下一步
 - 收集可调侧栏与播放器磨砂玻璃在不同壁纸和显示设置下的用户反馈。
@@ -53,6 +53,11 @@
 - `docs/CURRENT_HANDOFF.md`
 
 ### 生产环境变更
+- 公开提交 `0746613`、`b192d23` 已推送；注解标签 `v1.7.17` 指向 `b192d23`。
+- Release：https://github.com/Bananainkl/Project_Hennessy-open-source/releases/tag/v1.7.17（源码归档发布，无二进制附件）。
+- 已验证 DMG SHA-256：`c579f646fad6057b4c74deb789178e1a75d7b5f6309522d8dfe65371046af844`。
+- 已验证 Debug APK SHA-256：`da279c8844eddee19cadf32f7a22d04bd2c0b4f94e1082d6df4310c564592d43`，不作为 Release 附件发布。
+- GitHub 源码归档已验证：tar.gz `7c0c86ce84ea2a9ea5cba07c395d67922d9a81a3a4dd474e7853a7e25577c4b4`，zip `48d23fb0bc6fa7c936418cbc34878b033e4c7a0ed36db0eaddfcfb3a3b3dac0b`。
 - 公开提交 `f794d04` 已推送；注解标签 `v1.7.16` 与 GitHub Release 已验证。
 - Release：https://github.com/Bananainkl/Project_Hennessy-open-source/releases/tag/v1.7.16（源码归档发布，无二进制附件）。
 - 已验证 DMG SHA-256：`8b5d637a27f9bb1e711c8be800cd14c0245163510a30283e662fc0a452c0b0d8`。
