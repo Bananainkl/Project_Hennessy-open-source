@@ -2,6 +2,8 @@ import SwiftUI
 
 struct SidebarView: View {
     @Binding var selection: SidebarSection
+    @Environment(\.windowAppearanceStyle) private var appearanceStyle
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -48,8 +50,15 @@ struct SidebarView: View {
 
             Text("Hennessy")
                 .font(.system(size: 20, weight: .semibold))
-                .foregroundStyle(HennessyDesign.ColorToken.textPrimary)
+                .foregroundStyle(headerTextColor)
         }
+    }
+
+    private var headerTextColor: Color {
+        if appearanceStyle == .desktopTransparency && !reduceTransparency {
+            return Color.white.opacity(0.92)
+        }
+        return HennessyDesign.ColorToken.textPrimary
     }
 
     private func sidebarGroup(_ title: String?, items: [SidebarSection]) -> some View {
@@ -141,6 +150,7 @@ private struct SidebarRow: View {
             .contentShape(RoundedRectangle(cornerRadius: HennessyDesign.Radius.row, style: .continuous))
         }
         .buttonStyle(SidebarRowButtonStyle(isSelected: isSelected, isHovered: isHovered))
+        .focusEffectDisabled()
         .accessibilityLabel(item.title)
         .accessibilityIdentifier("sidebar-\(item.rawValue)")
         .onHover { hovering in

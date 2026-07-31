@@ -7,6 +7,7 @@
 - Removed the permanent sidebar separator while retaining a subtle resize indicator on hover.
 - Increased the full-width bottom player height from 72 to 84 points for more comfortable spacing.
 - Restored a visible frosted-glass treatment to the bottom player in Desktop Transparency mode.
+- Removed the persistent blue focus outline from sidebar rows and improved sidebar brand contrast in Desktop Transparency mode.
 
 ## 1.7.16 (186) - 2026-07-31
 
