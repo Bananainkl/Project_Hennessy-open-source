@@ -2,10 +2,25 @@ import SwiftUI
 
 struct SettingsView: View {
     @Bindable var store: DownloadStore
+    @AppStorage("windowAppearanceStyle") private var windowAppearanceStyle = WindowAppearanceStyle.glass
     @State private var showsUpgradeConfirmation = false
 
     var body: some View {
         Form {
+            Section("外观") {
+                Picker("窗口皮肤", selection: $windowAppearanceStyle) {
+                    ForEach(WindowAppearanceStyle.allCases) { style in
+                        Label(style.title, systemImage: style.icon)
+                            .tag(style)
+                    }
+                }
+                .pickerStyle(.segmented)
+
+                Text(windowAppearanceStyle.detail)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Section("默认保存") {
                 HStack {
                     Text(store.outputDirectory.path)
@@ -21,6 +36,7 @@ struct SettingsView: View {
                 LabeledContent("已检测", value: "\(store.auditedAudioCount) 首")
                 LabeledContent("需要改善", value: "\(store.audioItemsNeedingImprovement.count) 首")
                 LabeledContent("MP3 二次转码", value: "\(store.transcodedMP3Count) 首")
+
                 if let progress = store.audioQualityAuditProgress, store.isAudioQualityAuditRunning {
                     ProgressView(value: progress)
                 }

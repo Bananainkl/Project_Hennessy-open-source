@@ -102,9 +102,9 @@ extension View {
         }
     }
 
-    func liquidGlassBackdrop() -> some View {
+    func liquidGlassBackdrop(style: WindowAppearanceStyle = .glass) -> some View {
         background {
-            LiquidGlassBackdrop()
+            LiquidGlassBackdrop(style: style)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
@@ -379,8 +379,29 @@ private struct LiquidGlassSelectionButtonStyle: ButtonStyle {
 
 private struct LiquidGlassBackdrop: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    let style: WindowAppearanceStyle
 
     var body: some View {
+        if style == .desktopTransparency && !reduceTransparency {
+            ZStack {
+                Color.clear
+                Rectangle()
+                    .fill(.ultraThinMaterial)
+                    .opacity(0.46)
+                Color.black.opacity(0.16)
+                LinearGradient(
+                    colors: [Color.white.opacity(0.10), .clear, Color.black.opacity(0.08)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            }
+        } else {
+            classicBackdrop
+        }
+    }
+
+    private var classicBackdrop: some View {
         ZStack {
             Color.clear
 

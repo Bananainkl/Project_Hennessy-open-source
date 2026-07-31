@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.7.13 (183) - 2026-07-31
+
+- Added a user-selectable Desktop Transparency window skin alongside the existing Classic Glass appearance.
+- Made appearance changes apply immediately and persist across launches.
+- Preserved readable dark controls while allowing the desktop to show through the main content and sidebar.
+- Added an automatic Classic Glass fallback when macOS Reduce Transparency is enabled.
+- Added regression coverage for persisted appearance identifiers and user-facing appearance metadata.
+
 ## 1.7.12 (182) - 2026-07-21
 
 - Added automatic local audio-quality auditing with codec and effective-bitrate badges.

@@ -169,32 +169,8 @@ private extension NSAppearance {
 extension View {
     func appleMusicWindowBackground() -> some View {
         background {
-            ZStack {
-                Rectangle()
-                    .fill(.ultraThinMaterial)
-
-                LinearGradient(
-                    colors: [
-                        HennessyDesign.ColorToken.windowBackground,
-                        HennessyDesign.ColorToken.windowBackgroundWarm,
-                        Color.white.opacity(0.26)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .blendMode(.softLight)
-
-                LinearGradient(
-                    colors: [
-                        Color.white.opacity(0.28),
-                        Color.clear,
-                        Color.black.opacity(0.025)
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-            }
-            .ignoresSafeArea()
+            AppleMusicWindowBackground()
+                .ignoresSafeArea()
         }
     }
 
@@ -231,5 +207,48 @@ extension View {
         .scaleEffect(isPressed ? 0.97 : 1)
         .animation(.smooth(duration: 0.14), value: isHovered)
         .animation(.smooth(duration: 0.12), value: isPressed)
+    }
+}
+
+private struct AppleMusicWindowBackground: View {
+    @Environment(\.windowAppearanceStyle) private var appearanceStyle
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+
+    var body: some View {
+        if appearanceStyle == .desktopTransparency && !reduceTransparency {
+            ZStack {
+                Rectangle()
+                    .fill(.ultraThinMaterial)
+                    .opacity(0.18)
+                Color.black.opacity(0.08)
+                LinearGradient(
+                    colors: [Color.white.opacity(0.08), .clear, Color.black.opacity(0.06)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            }
+        } else {
+            ZStack {
+                Rectangle()
+                    .fill(.ultraThinMaterial)
+
+                LinearGradient(
+                    colors: [
+                        HennessyDesign.ColorToken.windowBackground,
+                        HennessyDesign.ColorToken.windowBackgroundWarm,
+                        Color.white.opacity(0.26)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .blendMode(.softLight)
+
+                LinearGradient(
+                    colors: [Color.white.opacity(0.28), .clear, Color.black.opacity(0.025)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            }
+        }
     }
 }

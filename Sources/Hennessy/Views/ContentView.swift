@@ -2,11 +2,12 @@ import SwiftUI
 
 struct ContentView: View {
     @Bindable var store: DownloadStore
+    @AppStorage("windowAppearanceStyle") private var windowAppearanceStyle = WindowAppearanceStyle.glass
 
     var body: some View {
         ZStack {
             Color.clear
-                .liquidGlassBackdrop()
+                .liquidGlassBackdrop(style: windowAppearanceStyle)
                 .background(WindowGlassConfigurator().frame(width: 0, height: 0))
             .ignoresSafeArea()
 
@@ -100,6 +101,7 @@ struct ContentView: View {
             }
             .toolbarBackground(.hidden, for: .windowToolbar)
             .toolbar(store.isFullPlayerPresented ? .hidden : .visible, for: .windowToolbar)
+            .clearWindowContainerBackground()
             .background(Color.clear)
             .opacity(store.isFullPlayerPresented ? 0 : 1)
             .allowsHitTesting(!store.isFullPlayerPresented)
@@ -121,11 +123,24 @@ struct ContentView: View {
             }
         }
         .tint(HennessyDesign.ColorToken.accent)
+        .environment(\.windowAppearanceStyle, windowAppearanceStyle)
+        .preferredColorScheme(windowAppearanceStyle == .desktopTransparency ? .dark : nil)
         .task {
             store.startAudioQualityAuditIfNeeded()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.clear)
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func clearWindowContainerBackground() -> some View {
+        if #available(macOS 15.0, *) {
+            containerBackground(.clear, for: .window)
+        } else {
+            self
+        }
     }
 }
 

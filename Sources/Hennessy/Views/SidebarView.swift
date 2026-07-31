@@ -64,7 +64,18 @@ struct SidebarView: View {
 }
 
 private struct SidebarGlassBackground: View {
+    @Environment(\.windowAppearanceStyle) private var appearanceStyle
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+
     var body: some View {
+        if appearanceStyle == .desktopTransparency && !reduceTransparency {
+            Color.clear
+        } else {
+            classicBackground
+        }
+    }
+
+    private var classicBackground: some View {
         ZStack {
             Rectangle()
                 .fill(.ultraThinMaterial)
@@ -73,21 +84,14 @@ private struct SidebarGlassBackground: View {
                 .fill(HennessyDesign.ColorToken.sidebarBackground.opacity(0.30))
 
             LinearGradient(
-                colors: [
-                    Color.white.opacity(0.24),
-                    Color.white.opacity(0.08),
-                    Color.clear
-                ],
+                colors: [Color.white.opacity(0.24), Color.white.opacity(0.08), Color.clear],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
             .blendMode(.screen)
 
             LinearGradient(
-                colors: [
-                    Color.clear,
-                    Color.black.opacity(0.025)
-                ],
+                colors: [Color.clear, Color.black.opacity(0.025)],
                 startPoint: .top,
                 endPoint: .bottom
             )
