@@ -4,7 +4,7 @@
 
 ---
 
-## 最新更新：2026-07-31 16:35（Asia/Shanghai）
+## 最新更新：2026-07-31 16:39（Asia/Shanghai）
 
 ### 最近完成
 - 全屏播放器改为保留原生红黄绿窗口控制，只隐藏常规工具栏；交通灯右侧保留单一下拉返回按钮，移除重复双按钮胶囊。
@@ -21,7 +21,7 @@
 - 在真实窗口中验证桌面透视、经典玻璃和最小窗口宽度。
 
 ### 当前状态
-- 公开源码已同步为 `1.7.18 (188)`，等待提交和 GitHub Release 验证。
+- 公开源码已发布为 `1.7.18 (188)`。
 - 私有/公开 Swift 各 32 项测试、Android 单测/Lint/APK、macOS Release/DMG、凭据路径扫描和精确许可证检查均已通过。
 - GitHub Release 已发布并验证源码归档；DMG 未捆绑第三方工具，未上传二进制附件。
 
@@ -55,6 +55,11 @@
 - `docs/CURRENT_HANDOFF.md`
 
 ### 生产环境变更
+- 公开提交 `fe1aadd` 已推送；注解标签 `v1.7.18` 指向 `fe1aadd`。
+- Release：https://github.com/Bananainkl/Project_Hennessy-open-source/releases/tag/v1.7.18（源码归档发布，无二进制附件）。
+- 已验证 DMG SHA-256：`1321f53ee410dbccd0ba95db73f9a4af8ae0d37811ad82434e73d82cb81c5ebd`。
+- 已验证 Debug APK SHA-256：`f4865fb68fe230dabd81271cba2d6b948ea13be14a678146fca3f72098e5b999`，不作为 Release 附件发布。
+- GitHub 源码归档已验证：tar.gz `d5881fcf1e62f635d88f437f0d87c0de71fc2fcafe17aeebb4beb6d3af4e058f`，zip `4bdfb130d24e04a2b7a1689c9e1c033537d07f28667a07477bb56cf6c49a75bf`。
 - 公开提交 `0746613`、`b192d23` 已推送；注解标签 `v1.7.17` 指向 `b192d23`。
 - Release：https://github.com/Bananainkl/Project_Hennessy-open-source/releases/tag/v1.7.17（源码归档发布，无二进制附件）。
 - 已验证 DMG SHA-256：`c579f646fad6057b4c74deb789178e1a75d7b5f6309522d8dfe65371046af844`。
