@@ -94,9 +94,9 @@ enum HennessyDesign {
     enum Component {
         static let windowMinimumWidth: CGFloat = 1080
         static let windowMinimumHeight: CGFloat = 700
-        static let sidebarMinWidth: CGFloat = 206
-        static let sidebarIdealWidth: CGFloat = 220
-        static let sidebarMaxWidth: CGFloat = 244
+        static let sidebarMinWidth: CGFloat = 188
+        static let sidebarIdealWidth: CGFloat = 200
+        static let sidebarMaxWidth: CGFloat = 218
         static let sidebarRowHeight: CGFloat = 34
         static let sidebarIconSize: CGFloat = 15
         static let sidebarIconColumn: CGFloat = 18
@@ -107,9 +107,9 @@ enum HennessyDesign {
         static let miniTransportMinWidth: CGFloat = 210
         static let miniTransportIdealWidth: CGFloat = 230
         static let miniTransportMaxWidth: CGFloat = 250
-        static let miniSummaryMinWidth: CGFloat = 190
-        static let miniSummaryIdealWidth: CGFloat = 230
-        static let miniSummaryMaxWidth: CGFloat = 280
+        static let miniSummaryMinWidth: CGFloat = 180
+        static let miniSummaryIdealWidth: CGFloat = 200
+        static let miniSummaryMaxWidth: CGFloat = 230
         static let miniTrailingMinWidth: CGFloat = 184
         static let miniTrailingIdealWidth: CGFloat = 212
         static let miniTrailingMaxWidth: CGFloat = 236

@@ -1,12 +1,13 @@
-# Hennessy 1.7.15
+# Hennessy 1.7.16
 
-This release gives the macOS app a denser, calmer music-library layout while keeping Hennessy's existing workflows intact.
+This release makes the macOS sidebar part of the window layout instead of presenting it as a floating panel.
 
 ## Highlights
 
-- A narrower sidebar and tighter spacing make more room for downloads and library content.
-- Flatter translucent panels reduce visual noise in both Classic Glass and Desktop Transparency.
-- The mini player now spans the bottom of the content area, with track details, centered transport controls, and playback tools in predictable groups.
-- The primary play button is easier to find without changing any playback behavior.
+- The sidebar now sits flush against the window edges and connects directly to the bottom player.
+- The bottom player spans the entire window, including the sidebar area.
+- Sidebar branding and navigation groups are denser and closer to familiar desktop music apps.
+- A dedicated toolbar button keeps the sidebar collapsible.
+- Desktop Transparency preserves visible background texture with a dark contrast layer for readable controls.
 
-All existing appearance preferences, keyboard shortcuts, accessibility labels, download modes, and playback features remain available.
+Download, library, playback, keyboard shortcut, and accessibility behavior is unchanged.

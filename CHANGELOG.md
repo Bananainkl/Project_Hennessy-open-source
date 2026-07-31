@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.7.16 (186) - 2026-07-31
+
+- Replaced the macOS 26 floating navigation sidebar with a flush, inline sidebar that connects directly to the window edges and bottom player.
+- Added an explicit toolbar control for showing and hiding the sidebar without changing navigation behavior.
+- Refined sidebar branding, grouping, width, and Desktop Transparency contrast while keeping the wallpaper visible.
+- Extended the bottom player across the full window instead of limiting it to the detail pane.
+
 ## 1.7.15 (185) - 2026-07-31
 
 - Refined the macOS interface with denser navigation, flatter translucent panels, and calmer visual hierarchy.

@@ -3,6 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @Bindable var store: DownloadStore
     @AppStorage("windowAppearanceStyle") private var windowAppearanceStyle = WindowAppearanceStyle.glass
+    @State private var isSidebarVisible = true
 
     var body: some View {
         ZStack {
@@ -11,36 +12,25 @@ struct ContentView: View {
                 .background(WindowGlassConfigurator().frame(width: 0, height: 0))
             .ignoresSafeArea()
 
-            NavigationSplitView {
-                SidebarView(selection: $store.selectedSection)
-                    .navigationSplitViewColumnWidth(
-                        min: HennessyDesign.Component.sidebarMinWidth,
-                        ideal: HennessyDesign.Component.sidebarIdealWidth,
-                        max: HennessyDesign.Component.sidebarMaxWidth
-                    )
-            } detail: {
-                ZStack(alignment: .bottom) {
-                    Group {
-                        switch store.selectedSection {
-                        case .search:
-                            SearchPageView(store: store)
-                        case .download:
-                            DownloadFormView(store: store)
-                        case .player:
-                            PlayerView(store: store)
-                        case .recent:
-                            RecentPlayedView(store: store)
-                        case .history:
-                            HistoryView(store: store)
-                        }
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            HStack(spacing: 0) {
+                if isSidebarVisible {
+                    SidebarView(selection: $store.selectedSection)
+                        .frame(width: HennessyDesign.Component.sidebarIdealWidth)
+                        .transition(.move(edge: .leading).combined(with: .opacity))
+                }
 
-                    if !store.isFullPlayerPresented {
-                        PersistentMiniPlayerBar(store: store)
-                            .padding(.horizontal, HennessyDesign.Spacing.miniPlayerHorizontal)
-                            .padding(.bottom, HennessyDesign.Spacing.miniPlayerBottom)
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                Group {
+                    switch store.selectedSection {
+                    case .search:
+                        SearchPageView(store: store)
+                    case .download:
+                        DownloadFormView(store: store)
+                    case .player:
+                        PlayerView(store: store)
+                    case .recent:
+                        RecentPlayedView(store: store)
+                    case .history:
+                        HistoryView(store: store)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -50,6 +40,16 @@ struct ContentView: View {
                 .toolbar(store.isFullPlayerPresented ? .hidden : .visible, for: .windowToolbar)
                 .toolbar {
                     ToolbarItemGroup {
+                        Button {
+                            withAnimation(.spring(response: 0.30, dampingFraction: 0.86)) {
+                                isSidebarVisible.toggle()
+                            }
+                        } label: {
+                            Label(isSidebarVisible ? "隐藏侧栏" : "显示侧栏", systemImage: "sidebar.left")
+                        }
+                        .help(isSidebarVisible ? "隐藏侧栏" : "显示侧栏")
+                        .accessibilityIdentifier("toolbar-toggle-sidebar")
+
                         Button {
                             store.selectedSection = .search
                         } label: {
@@ -105,6 +105,13 @@ struct ContentView: View {
             .background(Color.clear)
             .opacity(store.isFullPlayerPresented ? 0 : 1)
             .allowsHitTesting(!store.isFullPlayerPresented)
+
+            if !store.isFullPlayerPresented {
+                PersistentMiniPlayerBar(store: store)
+                    .frame(maxHeight: .infinity, alignment: .bottom)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .zIndex(5)
+            }
 
             if store.isFullPlayerPresented {
                 FullPlayerView(store: store, reduceMotion: false)

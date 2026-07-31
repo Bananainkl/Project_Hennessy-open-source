@@ -7,14 +7,20 @@ struct SidebarView: View {
         VStack(alignment: .leading, spacing: 0) {
             header
                 .padding(.horizontal, HennessyDesign.Spacing.sidebarHorizontal)
-                .padding(.top, 24)
-                .padding(.bottom, 8)
+                .padding(.top, 22)
+                .padding(.bottom, 14)
 
-            sidebarGroup("媒体资料库", items: [.search, .download])
-            sidebarGroup("资料库", items: [.player, .recent])
+            sidebarGroup(nil, items: [.search, .download])
+                .padding(.bottom, 10)
+
+            Divider()
+                .overlay(HennessyDesign.ColorToken.separator)
+                .padding(.horizontal, HennessyDesign.Spacing.sidebarHorizontal)
+
+            sidebarGroup("我的", items: [.player, .recent])
             sidebarGroup("记录", items: [.history])
 
-            Spacer(minLength: 24)
+            Spacer(minLength: HennessyDesign.Spacing.miniPlayerHeight + 24)
         }
         .frame(
             minWidth: HennessyDesign.Component.sidebarMinWidth,
@@ -35,9 +41,20 @@ struct SidebarView: View {
     }
 
     private var header: some View {
-        Text("Hennessy")
-            .font(.system(size: 23, weight: .bold))
-            .foregroundStyle(HennessyDesign.ColorToken.textPrimary)
+        HStack(spacing: 9) {
+            Circle()
+                .fill(HennessyDesign.ColorToken.accent)
+                .frame(width: 26, height: 26)
+                .overlay {
+                    Image(systemName: "music.note")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(.white)
+                }
+
+            Text("Hennessy")
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(HennessyDesign.ColorToken.textPrimary)
+        }
     }
 
     private func sidebarGroup(_ title: String?, items: [SidebarSection]) -> some View {
@@ -69,7 +86,14 @@ private struct SidebarGlassBackground: View {
 
     var body: some View {
         if appearanceStyle == .desktopTransparency && !reduceTransparency {
-            Color.clear
+            ZStack {
+                Color.black.opacity(0.34)
+                LinearGradient(
+                    colors: [Color.white.opacity(0.035), .clear, Color.black.opacity(0.06)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            }
         } else {
             classicBackground
         }
@@ -108,10 +132,6 @@ private struct SidebarRow: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 9) {
-                RoundedRectangle(cornerRadius: 2, style: .continuous)
-                    .fill(isSelected ? HennessyDesign.ColorToken.accent : Color.clear)
-                    .frame(width: 3, height: 18)
-
                 Image(systemName: item.icon)
                     .font(.system(size: HennessyDesign.Component.sidebarIconSize, weight: .semibold))
                     .frame(width: HennessyDesign.Component.sidebarIconColumn)
@@ -121,7 +141,7 @@ private struct SidebarRow: View {
             }
             .foregroundStyle(isSelected ? HennessyDesign.ColorToken.accent : HennessyDesign.ColorToken.textPrimary)
             .frame(height: HennessyDesign.Component.sidebarRowHeight)
-            .padding(.leading, 7)
+            .padding(.leading, 10)
             .padding(.trailing, 10)
             .contentShape(RoundedRectangle(cornerRadius: HennessyDesign.Radius.row, style: .continuous))
         }

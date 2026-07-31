@@ -386,12 +386,9 @@ private struct LiquidGlassBackdrop: View {
         if style == .desktopTransparency && !reduceTransparency {
             ZStack {
                 Color.clear
-                Rectangle()
-                    .fill(.ultraThinMaterial)
-                    .opacity(0.46)
-                Color.black.opacity(0.16)
+                Color.black.opacity(0.12)
                 LinearGradient(
-                    colors: [Color.white.opacity(0.10), .clear, Color.black.opacity(0.08)],
+                    colors: [Color.white.opacity(0.05), .clear, Color.black.opacity(0.07)],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
