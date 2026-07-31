@@ -1,12 +1,12 @@
-# Hennessy 1.7.14
+# Hennessy 1.7.15
 
-This release completes the optional Desktop Transparency skin in the macOS full player.
+This release gives the macOS app a denser, calmer music-library layout while keeping Hennessy's existing workflows intact.
 
 ## Highlights
 
-- The full player now lets the wallpaper and windows behind Hennessy show through when Desktop Transparency is selected.
-- Album artwork, the queue, and playback controls retain a subtle contrast layer for readability.
-- Classic Glass keeps its original player backdrop.
-- When macOS Reduce Transparency is enabled, the full player automatically uses the clearer opaque background.
+- A narrower sidebar and tighter spacing make more room for downloads and library content.
+- Flatter translucent panels reduce visual noise in both Classic Glass and Desktop Transparency.
+- The mini player now spans the bottom of the content area, with track details, centered transport controls, and playback tools in predictable groups.
+- The primary play button is easier to find without changing any playback behavior.
 
-The existing Classic Glass appearance remains the default for current and new users.
+All existing appearance preferences, keyboard shortcuts, accessibility labels, download modes, and playback features remain available.

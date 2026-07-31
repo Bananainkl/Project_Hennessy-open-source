@@ -12,12 +12,12 @@ enum HennessyDesign {
             dark: nsColor(red: 0.118, green: 0.103, blue: 0.110, alpha: 0.38)
         )
         static let sidebarBackground = adaptive(
-            light: nsColor(red: 0.949, green: 0.969, blue: 0.980, alpha: 0.46),
-            dark: nsColor(red: 0.095, green: 0.105, blue: 0.125, alpha: 0.54)
+            light: nsColor(red: 0.925, green: 0.932, blue: 0.940, alpha: 0.42),
+            dark: nsColor(red: 0.055, green: 0.058, blue: 0.064, alpha: 0.52)
         )
         static let cardBackground = adaptive(
-            light: nsColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 0.30),
-            dark: nsColor(red: 0.155, green: 0.165, blue: 0.190, alpha: 0.42)
+            light: nsColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 0.22),
+            dark: nsColor(red: 0.105, green: 0.110, blue: 0.122, alpha: 0.46)
         )
         static let glass = adaptive(
             light: nsColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 0.34),
@@ -60,13 +60,17 @@ enum HennessyDesign {
             light: nsColor(red: 0.980, green: 0.176, blue: 0.333, alpha: 0.12),
             dark: nsColor(red: 0.980, green: 0.176, blue: 0.333, alpha: 0.20)
         )
+        static let miniPlayerBackground = adaptive(
+            light: nsColor(red: 0.930, green: 0.935, blue: 0.945, alpha: 0.76),
+            dark: nsColor(red: 0.035, green: 0.037, blue: 0.042, alpha: 0.72)
+        )
     }
 
     enum Radius {
-        static let row: CGFloat = 10
-        static let panel: CGFloat = 18
-        static let player: CGFloat = 34
-        static let control: CGFloat = 14
+        static let row: CGFloat = 7
+        static let panel: CGFloat = 12
+        static let player: CGFloat = 0
+        static let control: CGFloat = 10
     }
 
     enum Shadow {
@@ -78,37 +82,37 @@ enum HennessyDesign {
     }
 
     enum Spacing {
-        static let contentHorizontal: CGFloat = 38
-        static let contentTop: CGFloat = 34
-        static let miniPlayerReserved: CGFloat = 110
-        static let sidebarHorizontal: CGFloat = 16
-        static let miniPlayerHorizontal: CGFloat = 38
-        static let miniPlayerBottom: CGFloat = 16
-        static let miniPlayerHeight: CGFloat = 68
+        static let contentHorizontal: CGFloat = 28
+        static let contentTop: CGFloat = 24
+        static let miniPlayerReserved: CGFloat = 84
+        static let sidebarHorizontal: CGFloat = 12
+        static let miniPlayerHorizontal: CGFloat = 0
+        static let miniPlayerBottom: CGFloat = 0
+        static let miniPlayerHeight: CGFloat = 72
     }
 
     enum Component {
         static let windowMinimumWidth: CGFloat = 1080
         static let windowMinimumHeight: CGFloat = 700
-        static let sidebarMinWidth: CGFloat = 238
-        static let sidebarIdealWidth: CGFloat = 258
-        static let sidebarMaxWidth: CGFloat = 282
-        static let sidebarRowHeight: CGFloat = 40
-        static let sidebarIconSize: CGFloat = 18
-        static let sidebarIconColumn: CGFloat = 20
+        static let sidebarMinWidth: CGFloat = 206
+        static let sidebarIdealWidth: CGFloat = 220
+        static let sidebarMaxWidth: CGFloat = 244
+        static let sidebarRowHeight: CGFloat = 34
+        static let sidebarIconSize: CGFloat = 15
+        static let sidebarIconColumn: CGFloat = 18
         static let mediaRowHeight: CGFloat = 64
         static let mediaThumbnail: CGFloat = 46
-        static let miniArtwork: CGFloat = 38
-        static let miniVolumeWidth: CGFloat = 112
-        static let miniTransportMinWidth: CGFloat = 186
-        static let miniTransportIdealWidth: CGFloat = 214
-        static let miniTransportMaxWidth: CGFloat = 232
-        static let miniSummaryMinWidth: CGFloat = 220
-        static let miniSummaryIdealWidth: CGFloat = 440
-        static let miniSummaryMaxWidth: CGFloat = 520
-        static let miniTrailingMinWidth: CGFloat = 206
-        static let miniTrailingIdealWidth: CGFloat = 244
-        static let miniTrailingMaxWidth: CGFloat = 282
+        static let miniArtwork: CGFloat = 42
+        static let miniVolumeWidth: CGFloat = 92
+        static let miniTransportMinWidth: CGFloat = 210
+        static let miniTransportIdealWidth: CGFloat = 230
+        static let miniTransportMaxWidth: CGFloat = 250
+        static let miniSummaryMinWidth: CGFloat = 190
+        static let miniSummaryIdealWidth: CGFloat = 230
+        static let miniSummaryMaxWidth: CGFloat = 280
+        static let miniTrailingMinWidth: CGFloat = 184
+        static let miniTrailingIdealWidth: CGFloat = 212
+        static let miniTrailingMaxWidth: CGFloat = 236
     }
 
     enum Typography {
@@ -181,7 +185,7 @@ extension View {
     func appleMusicCard(cornerRadius: CGFloat = HennessyDesign.Radius.panel) -> some View {
         background {
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                .fill(.ultraThinMaterial)
+                .fill(.thinMaterial)
                 .overlay {
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                         .fill(HennessyDesign.ColorToken.cardBackground)
@@ -189,9 +193,9 @@ extension View {
         }
             .overlay {
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .strokeBorder(Color.white.opacity(0.28), lineWidth: 0.8)
+                    .strokeBorder(HennessyDesign.ColorToken.separator.opacity(0.82), lineWidth: 0.7)
             }
-            .shadow(color: HennessyDesign.Shadow.cardColor, radius: HennessyDesign.Shadow.cardRadius, y: 10)
+            .shadow(color: HennessyDesign.Shadow.cardColor, radius: 8, y: 3)
     }
 
     func appleMusicPageSurface() -> some View {

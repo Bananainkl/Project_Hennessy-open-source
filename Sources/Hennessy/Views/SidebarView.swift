@@ -7,8 +7,8 @@ struct SidebarView: View {
         VStack(alignment: .leading, spacing: 0) {
             header
                 .padding(.horizontal, HennessyDesign.Spacing.sidebarHorizontal)
-                .padding(.top, 28)
-                .padding(.bottom, 10)
+                .padding(.top, 24)
+                .padding(.bottom, 8)
 
             sidebarGroup("媒体资料库", items: [.search, .download])
             sidebarGroup("资料库", items: [.player, .recent])
@@ -36,20 +36,20 @@ struct SidebarView: View {
 
     private var header: some View {
         Text("Hennessy")
-            .font(.system(size: 27, weight: .bold))
+            .font(.system(size: 23, weight: .bold))
             .foregroundStyle(HennessyDesign.ColorToken.textPrimary)
     }
 
     private func sidebarGroup(_ title: String?, items: [SidebarSection]) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 3) {
             if let title {
                 Text(title)
                     .font(HennessyDesign.Typography.sectionLabel)
                     .foregroundStyle(HennessyDesign.ColorToken.textSecondary.opacity(0.78))
                     .textCase(.uppercase)
                     .padding(.horizontal, HennessyDesign.Spacing.sidebarHorizontal)
-                    .padding(.top, 18)
-                    .padding(.bottom, 4)
+                    .padding(.top, 16)
+                    .padding(.bottom, 5)
             }
 
             ForEach(items) { item in
@@ -107,10 +107,10 @@ private struct SidebarRow: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 12) {
+            HStack(spacing: 9) {
                 RoundedRectangle(cornerRadius: 2, style: .continuous)
                     .fill(isSelected ? HennessyDesign.ColorToken.accent : Color.clear)
-                    .frame(width: 3, height: 22)
+                    .frame(width: 3, height: 18)
 
                 Image(systemName: item.icon)
                     .font(.system(size: HennessyDesign.Component.sidebarIconSize, weight: .semibold))
@@ -121,8 +121,8 @@ private struct SidebarRow: View {
             }
             .foregroundStyle(isSelected ? HennessyDesign.ColorToken.accent : HennessyDesign.ColorToken.textPrimary)
             .frame(height: HennessyDesign.Component.sidebarRowHeight)
-            .padding(.leading, 9)
-            .padding(.trailing, 12)
+            .padding(.leading, 7)
+            .padding(.trailing, 10)
             .contentShape(RoundedRectangle(cornerRadius: HennessyDesign.Radius.row, style: .continuous))
         }
         .buttonStyle(SidebarRowButtonStyle(isSelected: isSelected, isHovered: isHovered))

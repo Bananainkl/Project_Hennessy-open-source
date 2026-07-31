@@ -24,7 +24,7 @@ struct DownloadFormView: View {
     }
 
     private var contentStack: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 14) {
             statusHeader
             inputModePicker
             if inputMode == .single {
@@ -45,13 +45,13 @@ struct DownloadFormView: View {
         }
         .padding(.horizontal, HennessyDesign.Spacing.contentHorizontal)
         .padding(.top, HennessyDesign.Spacing.contentTop)
-        .padding(.bottom, HennessyDesign.Spacing.miniPlayerReserved + 18)
-        .frame(maxWidth: 920, alignment: .topLeading)
+        .padding(.bottom, HennessyDesign.Spacing.miniPlayerReserved + 12)
+        .frame(maxWidth: 980, alignment: .topLeading)
     }
 
     private var statusHeader: some View {
-        HStack(alignment: .center, spacing: 16) {
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+        HStack(alignment: .center, spacing: 14) {
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .fill(
                     LinearGradient(
                         colors: store.isRunning
@@ -61,17 +61,17 @@ struct DownloadFormView: View {
                         endPoint: .bottomTrailing
                     )
                 )
-                .frame(width: 50, height: 50)
+                .frame(width: 44, height: 44)
                 .overlay {
                     Image(systemName: store.isRunning ? "arrow.down.circle.fill" : "sparkles")
-                        .font(.system(size: 22, weight: .semibold))
+                        .font(.system(size: 19, weight: .semibold))
                         .symbolRenderingMode(.hierarchical)
                         .foregroundStyle(store.isRunning ? .white.opacity(0.92) : HennessyDesign.ColorToken.textSecondary)
                 }
 
             VStack(alignment: .leading, spacing: 5) {
                 Text("媒体下载")
-                    .font(.system(size: 30, weight: .bold))
+                    .font(.system(size: 26, weight: .bold))
                     .foregroundStyle(HennessyDesign.ColorToken.textPrimary)
 
                 HStack(spacing: 8) {
@@ -114,10 +114,14 @@ struct DownloadFormView: View {
                 .help(downloadButtonHelp)
             }
         }
-        .padding(.horizontal, 18)
-        .padding(.vertical, 14)
-        .frame(minHeight: 88)
-        .appleMusicGlassPanel(cornerRadius: 22)
+        .padding(.horizontal, 2)
+        .padding(.vertical, 10)
+        .frame(minHeight: 76)
+        .overlay(alignment: .bottom) {
+            Rectangle()
+                .fill(HennessyDesign.ColorToken.separator)
+                .frame(height: 0.7)
+        }
     }
 
     private var downloadButtonTitle: String {
@@ -192,7 +196,7 @@ struct DownloadFormView: View {
         }
         .pickerStyle(.segmented)
         .labelsHidden()
-        .frame(maxWidth: 560)
+        .frame(maxWidth: 520)
         .accessibilityIdentifier("download-input-mode-picker")
     }
 
@@ -263,7 +267,7 @@ struct DownloadFormView: View {
                 .font(HennessyDesign.Typography.cardTitle)
                 .foregroundStyle(HennessyDesign.ColorToken.textPrimary)
 
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 190), spacing: 12)], spacing: 12) {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 190), spacing: 10)], spacing: 10) {
                 ForEach(DownloadMode.allCases) { mode in
                     ModeCard(mode: mode, isSelected: store.selectedMode == mode) {
                         store.selectedMode = mode
@@ -920,14 +924,14 @@ private struct ModeCard: View {
 
                 Spacer(minLength: 0)
             }
-            .padding(12)
-            .frame(maxWidth: .infinity, minHeight: 74, alignment: .topLeading)
+            .padding(11)
+            .frame(maxWidth: .infinity, minHeight: 68, alignment: .topLeading)
             .background {
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
                     .fill(isSelected ? HennessyDesign.ColorToken.accentSoft : (isHovered ? HennessyDesign.ColorToken.hover : HennessyDesign.ColorToken.glassSubtle))
             }
             .overlay {
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
                     .strokeBorder(isSelected ? HennessyDesign.ColorToken.accent.opacity(0.72) : HennessyDesign.ColorToken.separator, lineWidth: isSelected ? 1.2 : 0.7)
             }
         }

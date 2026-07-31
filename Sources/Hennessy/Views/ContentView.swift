@@ -148,16 +148,7 @@ private struct PersistentMiniPlayerBar: View {
     @Bindable var store: DownloadStore
 
     var body: some View {
-        HStack(spacing: 16) {
-            transportControls
-                .frame(
-                    minWidth: HennessyDesign.Component.miniTransportMinWidth,
-                    idealWidth: HennessyDesign.Component.miniTransportIdealWidth,
-                    maxWidth: HennessyDesign.Component.miniTransportMaxWidth,
-                    alignment: .leading
-                )
-                .layoutPriority(2)
-
+        HStack(spacing: 12) {
             Button {
                 guard store.selectedLibraryItem != nil else { return }
                 withAnimation(.smooth(duration: 0.34)) {
@@ -172,12 +163,25 @@ private struct PersistentMiniPlayerBar: View {
             .frame(
                 minWidth: HennessyDesign.Component.miniSummaryMinWidth,
                 idealWidth: HennessyDesign.Component.miniSummaryIdealWidth,
-                maxWidth: HennessyDesign.Component.miniSummaryMaxWidth
+                maxWidth: HennessyDesign.Component.miniSummaryMaxWidth,
+                alignment: .leading
             )
-            .padding(.leading, 18)
             .layoutPriority(3)
             .disabled(store.selectedLibraryItem == nil)
             .help(store.selectedLibraryItem == nil ? "暂无播放内容" : "打开播放器")
+
+            Spacer(minLength: 8)
+
+            transportControls
+                .frame(
+                    minWidth: HennessyDesign.Component.miniTransportMinWidth,
+                    idealWidth: HennessyDesign.Component.miniTransportIdealWidth,
+                    maxWidth: HennessyDesign.Component.miniTransportMaxWidth,
+                    alignment: .center
+                )
+                .layoutPriority(4)
+
+            Spacer(minLength: 8)
 
             trailingControls
                 .frame(
@@ -186,11 +190,19 @@ private struct PersistentMiniPlayerBar: View {
                     maxWidth: HennessyDesign.Component.miniTrailingMaxWidth,
                     alignment: .trailing
                 )
-                .layoutPriority(4)
+                .layoutPriority(3)
         }
         .frame(height: HennessyDesign.Spacing.miniPlayerHeight)
-        .padding(.horizontal, 16)
-        .glassPanel(cornerRadius: HennessyDesign.Radius.player)
+        .padding(.horizontal, 20)
+        .background {
+            MiniPlayerShelfBackground()
+        }
+        .overlay(alignment: .top) {
+            Rectangle()
+                .fill(HennessyDesign.ColorToken.separator.opacity(0.92))
+                .frame(height: 0.7)
+        }
+        .shadow(color: .black.opacity(0.12), radius: 12, y: -4)
     }
 
     private var transportControls: some View {
@@ -254,7 +266,7 @@ private struct PersistentMiniPlayerBar: View {
                     Text(item.title)
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(HennessyDesign.ColorToken.textPrimary)
-                        .lineLimit(2)
+                        .lineLimit(1)
                         .minimumScaleFactor(0.88)
                     Text(item.displayArtist)
                         .font(.system(size: 11, weight: .regular))
@@ -324,6 +336,16 @@ private struct PersistentMiniPlayerBar: View {
     }
 }
 
+private struct MiniPlayerShelfBackground: View {
+    var body: some View {
+        Rectangle()
+            .fill(.ultraThinMaterial)
+            .overlay {
+                HennessyDesign.ColorToken.miniPlayerBackground
+            }
+    }
+}
+
 private struct MiniArtwork: View {
     let item: LibraryMediaItem
 
@@ -349,15 +371,15 @@ private struct MiniArtwork: View {
             }
         }
         .frame(width: HennessyDesign.Component.miniArtwork, height: HennessyDesign.Component.miniArtwork)
-        .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 9, style: .continuous)
+            RoundedRectangle(cornerRadius: 7, style: .continuous)
                 .strokeBorder(Color.white.opacity(0.20), lineWidth: 0.7)
         }
     }
 
     private var placeholder: some View {
-        RoundedRectangle(cornerRadius: 9, style: .continuous)
+        RoundedRectangle(cornerRadius: 7, style: .continuous)
             .fill(
                 item.mode == .video || item.mode == .videoMP4
                     ? LinearGradient(colors: [Color.gray.opacity(0.75), Color.black.opacity(0.85)], startPoint: .topLeading, endPoint: .bottomTrailing)
@@ -444,6 +466,9 @@ private struct MiniPlayerControlButtonStyle: ButtonStyle {
     }
 
     private func foreground(isPressed: Bool) -> Color {
+        if prominent {
+            return .white.opacity(isPressed ? 0.82 : 0.96)
+        }
         if active {
             return HennessyDesign.ColorToken.accent.opacity(isPressed ? 0.82 : 1)
         }
@@ -451,6 +476,9 @@ private struct MiniPlayerControlButtonStyle: ButtonStyle {
     }
 
     private func background(isPressed: Bool) -> Color {
+        if prominent {
+            return HennessyDesign.ColorToken.accent.opacity(isPressed ? 0.78 : (hovered ? 1 : 0.92))
+        }
         if active {
             return HennessyDesign.ColorToken.accent.opacity(isPressed ? 0.18 : (hovered ? 0.14 : 0.09))
         }
@@ -458,6 +486,9 @@ private struct MiniPlayerControlButtonStyle: ButtonStyle {
     }
 
     private func borderOpacity(isPressed: Bool) -> Double {
+        if prominent {
+            return isPressed ? 0.18 : 0.10
+        }
         if active {
             return isPressed ? 0.20 : (hovered ? 0.16 : 0.08)
         }

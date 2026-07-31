@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.15 (185) - 2026-07-31
+
+- Refined the macOS interface with denser navigation, flatter translucent panels, and calmer visual hierarchy.
+- Rebuilt the mini player as a full-width bottom control bar with track details on the left, transport controls in the center, and playback tools on the right.
+- Preserved Classic Glass, Desktop Transparency, accessibility labels, and existing download and playback behavior.
+
 ## 1.7.14 (184) - 2026-07-31
 
 - Extended the Desktop Transparency skin to the full player while preserving readable artwork, queue, and playback controls.
