@@ -23,13 +23,22 @@ jobs:
           grep -Fq "${version}" RELEASE_NOTES.md
           grep -Fq "## ${version} (${build})" CHANGELOG.md
 
-      - name: Test and package macOS
+      - name: Validate macOS runner
         run: |
           test "$(uname -m)" = "arm64"
           swift --version
           xcodebuild -version
+
+      - name: Test macOS
+        run: |
           swift test
+
+      - name: Package macOS
+        run: |
           ./script/package_dmg.sh
+
+      - name: Verify macOS package
+        run: |
           version="$(tr -d '[:space:]' < VERSION)"
           dmg="dist/Hennessy-${version}-mac.dmg"
           hdiutil verify "${dmg}"
