@@ -4,9 +4,12 @@
 
 ---
 
-## 最新更新：2026-07-31 19:18（Asia/Shanghai）
+## 最新更新：2026-08-12 21:51（Asia/Hong_Kong）
 
 ### 最近完成
+- 修复 GitHub Release 只发布源码、不上传安装包的问题；标签发布现在自动构建并上传 macOS DMG、Android arm64 APK 与 SHA-256 校验文件。
+- 发布 `1.7.20 (190)`，并从 GitHub 下载三个线上附件完成校验和、DMG 镜像、APK 签名与版本复验。
+- 发布工作流固定使用 arm64 `macos-15` Runner 和 Xcode 26.2，以支持项目中的 macOS 26 玻璃 API。
 - 修复全屏播放器隐藏工具栏后原生窗口控制上移的问题：记录并恢复主界面的窗口坐标，同时将下拉箭头与交通灯垂直居中对齐。
 - 全屏播放器改为保留原生红黄绿窗口控制，只隐藏常规工具栏；交通灯右侧保留单一下拉返回按钮，移除重复双按钮胶囊。
 - 为贴边侧栏加入 188-360pt 拖动调宽、跨启动持久化、无障碍增减操作和双击复位；按用户确认将默认值设为 195pt。
@@ -22,18 +25,20 @@
 - 在真实窗口中验证桌面透视、经典玻璃和最小窗口宽度。
 
 ### 当前状态
-- 公开源码已发布为 `1.7.19 (189)`。
+- 公开源码与安装包已发布为 `1.7.20 (190)`。
 - 私有/公开 Swift 各 32 项测试、Android 单测/Lint/APK、macOS Release/DMG、凭据路径扫描和精确许可证检查均已通过。
-- GitHub Release 已发布并验证源码归档；DMG 未捆绑第三方工具，未上传二进制附件。
+- GitHub Release 已包含并验证 macOS DMG、Android arm64 Debug APK、SHA-256 校验文件和源码归档。
 
 ### 下一步
 - 收集可调侧栏与播放器磨砂玻璃在不同壁纸和显示设置下的用户反馈。
-- 如需分发二进制安装包，先登录 `gh`，再上传已验证的 macOS DMG；Android Debug APK 不作为 Release 附件。
+- 获取 Apple Developer ID 并接入公证，替换当前 macOS 临时签名包；为 Android 配置正式 Release 签名后替换 Debug APK。
 
 ### 阻塞/待确认
-- 无。
+- 安装包已可下载；正式免警告分发仍需要 Apple Developer ID/公证凭据和 Android Release 签名密钥。
 
 ### 不可破坏的决定
+- 每个后续公开版本必须由标签工作流上传 DMG、APK 和 `SHA256SUMS.txt`，并在 Release 中明确披露签名级别。
+- 构建包含 macOS 26 API 的版本时必须显式选择 Xcode 26.2 或兼容的新版本，不能退回默认 Xcode 16 工具链。
 - 全屏播放器必须使用 AppKit 原生红黄绿窗口控制；常规工具栏隐藏时仍需保持交通灯可见并维持主界面坐标，下拉箭头与交通灯中心线对齐。
 - 侧栏默认宽度为用户确认的 195pt，可在 188-360pt 范围内拖动并持久化；常驻分隔线不得恢复。
 - 桌面透视模式的底部播放器必须保留可见磨砂玻璃，播放器高度保持 84pt。
@@ -47,6 +52,8 @@
 - 完整播放器仅在“桌面透视”且系统未启用“降低透明度”时使用透明遮罩；其他状态保留原背景。
 
 ### 涉及文件
+- `.github/workflows/release.yml`
+- `docs/PROJECT_CONTEXT.md`
 - `Sources/Hennessy/Support/AppleMusicDesignSystem.swift`
 - `Sources/Hennessy/Support/ViewModifiers.swift`
 - `Sources/Hennessy/Views/ContentView.swift`
@@ -56,6 +63,11 @@
 - `docs/CURRENT_HANDOFF.md`
 
 ### 生产环境变更
+- 公开提交 `ff5debe`、`d38a9c6`、`8b07a14`、`8d8fdb8`、`cf667ca` 已推送；公开注解标签 `v1.7.20` 最终指向 `cf667ca`。
+- Release：https://github.com/Bananainkl/Project_Hennessy-open-source/releases/tag/v1.7.20，含三个已验证附件。
+- 线上 DMG SHA-256：`0830020435857aeeef0a54d5f5c88d180ea42882050536ce22125a5465a635bf`。
+- 线上 Android APK SHA-256：`a0da8ddf99752e43fdd8f701487135f0545f97d33cd1c59d67daaef8c2a66597`。
+- DMG 为 arm64、临时签名且未公证；APK 为 arm64 Debug v2 签名，Release Notes 已明确披露。
 - 公开提交 `0ac8b38` 已推送；注解标签 `v1.7.19` 指向 `0ac8b38`。
 - Release：https://github.com/Bananainkl/Project_Hennessy-open-source/releases/tag/v1.7.19（源码归档发布，无二进制附件）。
 - 已验证 DMG SHA-256：`dc37067a5d5d033d53ce184ba97c52d84058f2d4bf357b0bf5fbb477112f26c8`。
