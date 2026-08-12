@@ -10,9 +10,9 @@ permissions:
 
 jobs:
   release:
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Validate version and release notes
         run: |
@@ -25,6 +25,9 @@ jobs:
 
       - name: Test and package macOS
         run: |
+          test "$(uname -m)" = "arm64"
+          swift --version
+          xcodebuild -version
           swift test
           ./script/package_dmg.sh
           version="$(tr -d '[:space:]' < VERSION)"
@@ -34,16 +37,12 @@ jobs:
           test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' dist/Hennessy.app/Contents/Info.plist)" = "${version}"
           test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' dist/Hennessy.app/Contents/Info.plist)" = "$(tr -d '[:space:]' < BUILD_NUMBER)"
 
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
-
-      - uses: android-actions/setup-android@v3
-
       - name: Test and package Android
         run: |
-          sdkmanager "platforms;android-36" "build-tools;36.0.0"
+          export JAVA_HOME="${JAVA_HOME_17_arm64}"
+          export PATH="${JAVA_HOME}/bin:${PATH}"
+          java -version
+          test -x "${ANDROID_HOME}/build-tools/36.0.0/apksigner"
           chmod +x android-app/gradlew
           cd android-app
           ./gradlew :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
