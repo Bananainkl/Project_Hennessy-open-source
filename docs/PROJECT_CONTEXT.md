@@ -1,6 +1,6 @@
 # Hennessy Project Context
 
-> Last verified from repository documentation: 2026-07-30
+> Last verified from repository documentation: 2026-08-12
 
 ## Purpose
 
@@ -18,6 +18,7 @@ Hennessy is a native macOS media downloader, local library, and player with an e
 - Downloaded media stays outside Git and defaults to `~/Downloads/Media`.
 - Low-quality replacement must be measurably better and preserve a recoverable backup.
 - Releases must keep macOS and Android version metadata aligned.
+- Tagged releases automatically build and attach a validated macOS DMG, Android arm64 Debug APK, and SHA-256 checksums; their signing level must be disclosed in the release notes.
 - Public synchronization must exclude private history, credentials, downloaded media, audit artifacts, and unreviewed third-party binaries.
 
 ## Current State And Risks

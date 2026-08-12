@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.20 (190) - 2026-08-12
+
+- Added automatic macOS DMG and Android arm64 APK builds to tagged GitHub Releases.
+- Added package integrity, version, signing, test, and lint checks before publishing a release.
+- Added SHA-256 checksums and explicit signing labels to release downloads.
+
 ## 1.7.19 (189) - 2026-07-31
 
 - Kept the native macOS window controls at the same position when entering and leaving the full player.

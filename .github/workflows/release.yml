@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
 
@@ -23,11 +23,53 @@ jobs:
           grep -Fq "${version}" RELEASE_NOTES.md
           grep -Fq "## ${version} (${build})" CHANGELOG.md
 
-      - name: Create GitHub Release
+      - name: Test and package macOS
+        run: |
+          swift test
+          ./script/package_dmg.sh
+          version="$(tr -d '[:space:]' < VERSION)"
+          dmg="dist/Hennessy-${version}-mac.dmg"
+          hdiutil verify "${dmg}"
+          codesign --verify --deep --strict --verbose=2 dist/Hennessy.app
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' dist/Hennessy.app/Contents/Info.plist)" = "${version}"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' dist/Hennessy.app/Contents/Info.plist)" = "$(tr -d '[:space:]' < BUILD_NUMBER)"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Test and package Android
+        run: |
+          sdkmanager "platforms;android-36" "build-tools;36.0.0"
+          chmod +x android-app/gradlew
+          cd android-app
+          ./gradlew :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
+          version="$(tr -d '[:space:]' < ../VERSION)"
+          apk="app/build/outputs/apk/debug/app-debug.apk"
+          "${ANDROID_HOME}/build-tools/36.0.0/apksigner" verify --verbose "${apk}"
+          cp "${apk}" "../dist/Hennessy-${version}-android-arm64-debug.apk"
+
+      - name: Generate package checksums
+        run: |
+          version="$(tr -d '[:space:]' < VERSION)"
+          cd dist
+          shasum -a 256 \
+            "Hennessy-${version}-mac.dmg" \
+            "Hennessy-${version}-android-arm64-debug.apk" \
+            > SHA256SUMS.txt
+
+      - name: Create GitHub Release with installers
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          version="$(tr -d '[:space:]' < VERSION)"
           gh release create "${GITHUB_REF_NAME}" \
             --verify-tag \
             --title "Hennessy ${GITHUB_REF_NAME}" \
-            --notes-file RELEASE_NOTES.md
+            --notes-file RELEASE_NOTES.md \
+            "dist/Hennessy-${version}-mac.dmg#macOS DMG (ad-hoc signed)" \
+            "dist/Hennessy-${version}-android-arm64-debug.apk#Android arm64 APK (debug signed)" \
+            "dist/SHA256SUMS.txt#SHA-256 checksums"
