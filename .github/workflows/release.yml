@@ -26,6 +26,7 @@ jobs:
       - name: Validate macOS runner
         run: |
           test "$(uname -m)" = "arm64"
+          sudo xcode-select --switch /Applications/Xcode_26.2.app/Contents/Developer
           swift --version
           xcodebuild -version
 
