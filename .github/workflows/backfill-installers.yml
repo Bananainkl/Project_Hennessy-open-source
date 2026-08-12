@@ -1,0 +1,104 @@
+name: Backfill Historical Installers
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/backfill-installers.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  backfill:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[backfill-installers]')
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - 1.7.12
+          - 1.7.13
+          - 1.7.14
+          - 1.7.15
+          - 1.7.16
+          - 1.7.17
+          - 1.7.18
+          - 1.7.19
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: v${{ matrix.version }}
+
+      - name: Validate historical source
+        run: |
+          test "$(tr -d '[:space:]' < VERSION)" = "${{ matrix.version }}"
+          test "$(uname -m)" = "arm64"
+          test -s Assets/Tools/THIRD_PARTY_NOTICES.txt
+          grep -Fq "youtubedl-android library and ffmpeg artifacts: 0.18.1" Assets/Tools/THIRD_PARTY_NOTICES.txt
+          grep -Fq 'io.github.junkfood02.youtubedl-android:library:0.18.1' android-app/app/build.gradle.kts
+          grep -Fq 'io.github.junkfood02.youtubedl-android:ffmpeg:0.18.1' android-app/app/build.gradle.kts
+          sudo xcode-select --switch /Applications/Xcode_26.2.app/Contents/Developer
+          swift --version
+          xcodebuild -version
+
+      - name: Test and package macOS
+        run: |
+          swift test
+          ./script/package_dmg.sh
+          version="${{ matrix.version }}"
+          dmg="dist/Hennessy-${version}-mac.dmg"
+          hdiutil verify "${dmg}"
+          codesign --verify --deep --strict --verbose=2 dist/Hennessy.app
+          file dist/Hennessy.app/Contents/MacOS/Hennessy | grep -Fq arm64
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' dist/Hennessy.app/Contents/Info.plist)" = "${version}"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' dist/Hennessy.app/Contents/Info.plist)" = "$(tr -d '[:space:]' < BUILD_NUMBER)"
+          test ! -x dist/Hennessy.app/Contents/Resources/Tools/ffmpeg
+          test ! -x dist/Hennessy.app/Contents/Resources/Tools/yt-dlp
+
+      - name: Test and package Android
+        run: |
+          export JAVA_HOME="${JAVA_HOME_17_arm64}"
+          export PATH="${JAVA_HOME}/bin:${PATH}"
+          chmod +x android-app/gradlew
+          cd android-app
+          ./gradlew --no-daemon :app:testDebugUnitTest :app:assembleDebug
+          set +e
+          ./gradlew --no-daemon :app:lintDebug 2>&1 | tee historical-lint.log
+          lint_status="${PIPESTATUS[0]}"
+          set -e
+          if [[ "${lint_status}" -ne 0 ]]; then
+            details="$(tail -n 20 historical-lint.log | tr '\n' ' ')"
+            echo "::warning title=Historical lint finding in v${{ matrix.version }}::${details}"
+          fi
+          version="${{ matrix.version }}"
+          apk="app/build/outputs/apk/debug/app-debug.apk"
+          "${ANDROID_HOME}/build-tools/36.0.0/apksigner" verify --verbose "${apk}"
+          "${ANDROID_HOME}/build-tools/36.0.0/aapt" dump badging "${apk}" | grep -Fq "versionName='${version}'"
+          cp "${apk}" "../dist/Hennessy-${version}-android-arm64-debug.apk"
+
+      - name: Generate and verify checksums
+        run: |
+          version="${{ matrix.version }}"
+          cd dist
+          shasum -a 256 \
+            "Hennessy-${version}-mac.dmg" \
+            "Hennessy-${version}-android-arm64-debug.apk" \
+            > SHA256SUMS.txt
+          shasum -a 256 -c SHA256SUMS.txt
+
+      - name: Upload installers to historical release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${{ matrix.version }}"
+          tag="v${version}"
+          gh release view "${tag}" >/dev/null
+          gh release upload "${tag}" --clobber \
+            "dist/Hennessy-${version}-mac.dmg#macOS DMG (ad-hoc signed)" \
+            "dist/Hennessy-${version}-android-arm64-debug.apk#Android arm64 APK (debug signed)" \
+            "dist/SHA256SUMS.txt#SHA-256 checksums"
+          test "$(gh release view "${tag}" --json assets --jq '.assets | length')" -ge 3
