@@ -23,7 +23,7 @@ Hennessy is a native macOS media downloader, local library, and player with an e
 
 ## Current State And Risks
 
-The main download, library, playback, metadata, lyrics, duplicate detection, quality-audit, and user-selectable window appearance workflows are implemented. Distribution remains dependent on separately prepared third-party tools and their license obligations. Read `docs/CURRENT_HANDOFF.md` for the latest task state and verification evidence.
+The main download, library, playback, metadata, lyrics, duplicate detection, quality-audit, and user-selectable window appearance workflows are implemented. Every public release from `v1.7.12` onward includes a macOS DMG, Android arm64 APK, and SHA-256 checksums. Distribution remains dependent on separately prepared third-party tools and their license obligations. Read `docs/CURRENT_HANDOFF.md` for the latest task state and verification evidence.
 
 ## Maintenance
 

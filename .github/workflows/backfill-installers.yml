@@ -2,18 +2,12 @@ name: Backfill Historical Installers
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - ".github/workflows/backfill-installers.yml"
 
 permissions:
   contents: write
 
 jobs:
   backfill:
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[backfill-installers]')
     runs-on: macos-15
     strategy:
       fail-fast: false

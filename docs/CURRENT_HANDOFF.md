@@ -4,9 +4,12 @@
 
 ---
 
-## 最新更新：2026-08-12 21:51（Asia/Hong_Kong）
+## 最新更新：2026-08-12 22:19（Asia/Hong_Kong）
 
 ### 最近完成
+- 为 `v1.7.12` 至 `v1.7.19` 八个历史 Release 逐版从对应标签构建并补传 DMG、Android arm64 APK 与 SHA-256 校验文件。
+- 八个历史回填任务全部成功；线上回下载复验确认每版校验和、DMG 镜像、arm64 架构、包内版本、代码签名与 APK 签名/版本均正确。
+- 将历史回填工作流收口为仅手动触发，避免普通提交意外重复上传。
 - 修复 GitHub Release 只发布源码、不上传安装包的问题；标签发布现在自动构建并上传 macOS DMG、Android arm64 APK 与 SHA-256 校验文件。
 - 发布 `1.7.20 (190)`，并从 GitHub 下载三个线上附件完成校验和、DMG 镜像、APK 签名与版本复验。
 - 发布工作流固定使用 arm64 `macos-15` Runner 和 Xcode 26.2，以支持项目中的 macOS 26 玻璃 API。
@@ -27,7 +30,7 @@
 ### 当前状态
 - 公开源码与安装包已发布为 `1.7.20 (190)`。
 - 私有/公开 Swift 各 32 项测试、Android 单测/Lint/APK、macOS Release/DMG、凭据路径扫描和精确许可证检查均已通过。
-- GitHub Release 已包含并验证 macOS DMG、Android arm64 Debug APK、SHA-256 校验文件和源码归档。
+- GitHub `v1.7.12` 至 `v1.7.20` 九个 Release 均已包含并验证 macOS DMG、Android arm64 Debug APK、SHA-256 校验文件和源码归档。
 
 ### 下一步
 - 收集可调侧栏与播放器磨砂玻璃在不同壁纸和显示设置下的用户反馈。
@@ -35,6 +38,7 @@
 
 ### 阻塞/待确认
 - 安装包已可下载；正式免警告分发仍需要 Apple Developer ID/公证凭据和 Android Release 签名密钥。
+- `v1.7.12` 保留其标签源码中的 Android API 版本 Lint 历史警告；从 `v1.7.13` 起已修复，未用新版代码冒充旧版包。
 
 ### 不可破坏的决定
 - 每个后续公开版本必须由标签工作流上传 DMG、APK 和 `SHA256SUMS.txt`，并在 Release 中明确披露签名级别。
@@ -53,6 +57,7 @@
 
 ### 涉及文件
 - `.github/workflows/release.yml`
+- `.github/workflows/backfill-installers.yml`
 - `docs/PROJECT_CONTEXT.md`
 - `Sources/Hennessy/Support/AppleMusicDesignSystem.swift`
 - `Sources/Hennessy/Support/ViewModifiers.swift`
@@ -63,6 +68,8 @@
 - `docs/CURRENT_HANDOFF.md`
 
 ### 生产环境变更
+- 公开提交 `2ae5e08` 已推送；历史回填工作流 https://github.com/Bananainkl/Project_Hennessy-open-source/actions/runs/31604268921 的八个子任务全部成功。
+- `v1.7.12` 至 `v1.7.20` 每个 Release 均经 API 核对为三个附件；`v1.7.12` 至 `v1.7.19` 的 24 个历史附件已全部回下载复验。
 - 公开提交 `ff5debe`、`d38a9c6`、`8b07a14`、`8d8fdb8`、`cf667ca` 已推送；公开注解标签 `v1.7.20` 最终指向 `cf667ca`。
 - Release：https://github.com/Bananainkl/Project_Hennessy-open-source/releases/tag/v1.7.20，含三个已验证附件。
 - 线上 DMG SHA-256：`0830020435857aeeef0a54d5f5c88d180ea42882050536ce22125a5465a635bf`。
