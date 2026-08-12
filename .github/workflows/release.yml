@@ -31,7 +31,15 @@ jobs:
 
       - name: Test macOS
         run: |
-          swift test
+          set +e
+          swift test 2>&1 | tee swift-test.log
+          test_status="${PIPESTATUS[0]}"
+          set -e
+          if [[ "${test_status}" -ne 0 ]]; then
+            details="$(tail -n 30 swift-test.log | tr '\n' ' ')"
+            echo "::error title=Swift tests failed::${details}"
+            exit "${test_status}"
+          fi
 
       - name: Package macOS
         run: |
