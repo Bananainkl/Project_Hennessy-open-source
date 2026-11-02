@@ -14,10 +14,10 @@
 ### 当前状态
 - 私有与公开源代码都已通过 39 项 Swift 测试及 `./script/build_and_run.sh --verify`。
 - macOS `1.7.21 (191)` arm64 DMG 已校验镜像、adhoc 签名和版本，包内不含第三方命令行工具；SHA-256：`8c610ee551e82a96ef4a0260c0644e57843738d76b1cf3823a8900c28ec3c42e`。
-- 尚未创建或发布 `v1.7.21`；历史 GitHub Release 与 Android 附件保持原样。
+- 代码已提交并推送到公开 `main`（`feef243`）；尚未创建或发布 `v1.7.21`，历史 GitHub Release 与 Android 附件保持原样。
 
 ### 下一步
-- 完成 staged diff 与提交；只有完成远程 Release 验证后才创建发布标签。公开敏感路径/密钥样式扫描无命中，Android 构建入口扫描仅命中历史说明。
+- 当前无待完成代码工作；只有完成远程 Release 验证后才创建发布标签。公开敏感路径/密钥样式扫描无命中，Android 构建入口扫描仅命中历史说明。
 
 ### 不可破坏的决定
 - Hennessy 仅支持 macOS；不再构建或发布 Android 工件，但保留历史发布。
