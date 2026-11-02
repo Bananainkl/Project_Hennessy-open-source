@@ -44,7 +44,7 @@ jobs:
 
       - name: Package macOS
         run: |
-          ./script/package_dmg.sh
+          BUNDLE_EXTERNAL_TOOLS=0 ./script/package_dmg.sh
 
       - name: Verify macOS package
         run: |
@@ -55,28 +55,11 @@ jobs:
           test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' dist/Hennessy.app/Contents/Info.plist)" = "${version}"
           test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' dist/Hennessy.app/Contents/Info.plist)" = "$(tr -d '[:space:]' < BUILD_NUMBER)"
 
-      - name: Test and package Android
-        run: |
-          export JAVA_HOME="${JAVA_HOME_17_arm64}"
-          export PATH="${JAVA_HOME}/bin:${PATH}"
-          java -version
-          test -x "${ANDROID_HOME}/build-tools/36.0.0/apksigner"
-          chmod +x android-app/gradlew
-          cd android-app
-          ./gradlew :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
-          version="$(tr -d '[:space:]' < ../VERSION)"
-          apk="app/build/outputs/apk/debug/app-debug.apk"
-          "${ANDROID_HOME}/build-tools/36.0.0/apksigner" verify --verbose "${apk}"
-          cp "${apk}" "../dist/Hennessy-${version}-android-arm64-debug.apk"
-
       - name: Generate package checksums
         run: |
           version="$(tr -d '[:space:]' < VERSION)"
           cd dist
-          shasum -a 256 \
-            "Hennessy-${version}-mac.dmg" \
-            "Hennessy-${version}-android-arm64-debug.apk" \
-            > SHA256SUMS.txt
+          shasum -a 256 "Hennessy-${version}-mac.dmg" > SHA256SUMS.txt
 
       - name: Create GitHub Release with installers
         env:
@@ -88,5 +71,4 @@ jobs:
             --title "Hennessy ${GITHUB_REF_NAME}" \
             --notes-file RELEASE_NOTES.md \
             "dist/Hennessy-${version}-mac.dmg#macOS DMG (ad-hoc signed)" \
-            "dist/Hennessy-${version}-android-arm64-debug.apk#Android arm64 APK (debug signed)" \
             "dist/SHA256SUMS.txt#SHA-256 checksums"

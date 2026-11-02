@@ -35,6 +35,7 @@ final class DownloadStore {
     var progressDetail = ""
     var lastOutputURL: URL?
     var isRunning = false
+    private var cancellationRequested = false
     var records: [DownloadRecord] = []
     var isSearchPresented = false
     var mediaSearchQuery = ""
@@ -214,6 +215,7 @@ final class DownloadStore {
         let items = audioItemsNeedingImprovement
         guard !items.isEmpty else { return }
         isRunning = true
+        cancellationRequested = false
         isAudioQualityUpgradeRunning = true
         audioQualityUpgradeSummary = nil
         errorSummary = nil
@@ -227,7 +229,7 @@ final class DownloadStore {
             var failed = 0
             var skipped = 0
             for (index, snapshot) in items.enumerated() {
-                guard isRunning else { break }
+                guard isRunning, !cancellationRequested else { break }
                 guard let item = libraryItems.first(where: { $0.id == snapshot.id }),
                       let originalQuality = audioQualityByItemID[item.id]
                 else {
@@ -264,6 +266,7 @@ final class DownloadStore {
                     let result = try await service.download(request: request) { [weak self] chunk in
                         Task { @MainActor in self?.appendLog(chunk) }
                     }
+                    guard !cancellationRequested else { break }
                     guard result.succeeded, let candidateURL = result.finalURL else {
                         failed += 1
                         appendLog("候选文件下载失败，原文件保持不变。\n")
@@ -280,6 +283,10 @@ final class DownloadStore {
                     appendLog("已提升：\(originalQuality.compactDescription) → \(candidateQuality.compactDescription)\n")
                     appendLog("新文件：\(replacement.filePath)\n")
                 } catch {
+                    if error is CancellationError || cancellationRequested {
+                        cancellationRequested = true
+                        break
+                    }
                     failed += 1
                     appendLog("改善失败：\(error.localizedDescription)。原文件保持不变。\n")
                 }
@@ -443,6 +450,7 @@ final class DownloadStore {
         guard !entries.isEmpty, !isRunning else { return }
 
         isRunning = true
+        cancellationRequested = false
         lastOutputURL = nil
         errorSummary = nil
         downloadProgress = 0
@@ -459,7 +467,7 @@ final class DownloadStore {
             var failed = 0
 
             for (index, entry) in entries.enumerated() {
-                guard isRunning else { break }
+                guard isRunning, !cancellationRequested else { break }
 
                 progressDetail = "\(index + 1)/\(entries.count)"
                 downloadProgress = Double(index) / Double(entries.count)
@@ -468,6 +476,7 @@ final class DownloadStore {
 
                 do {
                     let resolved = try await resolvePlaylistEntry(entry)
+                    guard !cancellationRequested else { break }
                     if let matchTitle = resolved.matchTitle {
                         updatePlaylistProgress(index, state: .matched, detail: "匹配：\(matchTitle)")
                     }
@@ -515,35 +524,45 @@ final class DownloadStore {
                             self?.appendLog(chunk)
                         }
                     }
+                    guard !cancellationRequested else { break }
 
-                    let outputURL = result.finalURL
+                    let outputURLs = result.finalURLs
+                    let outputURL = outputURLs.last
                     lastOutputURL = outputURL
-                    records.insert(DownloadRecord(
-                        title: outputURL?.lastPathComponent ?? entry.displayName,
-                        url: resolved.url,
-                        outputURL: outputURL,
-                        mode: request.mode,
-                        startedAt: startedAt,
-                        succeeded: result.succeeded
-                    ), at: 0)
-
-                    if result.succeeded, let outputURL {
-                        completed += 1
-                        updatePlaylistProgress(index, state: .done, detail: outputURL.lastPathComponent)
-                        addToLibrary(
-                            fileURL: outputURL,
-                            sourceURL: resolved.url,
+                    for url in outputURLs.reversed() {
+                        records.insert(DownloadRecord(
+                            title: url.lastPathComponent,
+                            url: resolved.url,
+                            outputURL: url,
                             mode: request.mode,
-                            thumbnailURL: result.thumbnailURL ?? resolved.thumbnailURL ?? entry.thumbnailURL,
-                            title: result.songTitle ?? entry.title,
-                            artist: result.artistName ?? entry.artist
-                        )
+                            startedAt: startedAt,
+                            succeeded: result.succeeded
+                        ), at: 0)
+                    }
+
+                    if result.succeeded, !outputURLs.isEmpty {
+                        completed += outputURLs.count
+                        updatePlaylistProgress(index, state: .done, detail: outputURLs.map(\.lastPathComponent).joined(separator: "、"))
+                        for url in outputURLs {
+                            addToLibrary(
+                                fileURL: url,
+                                sourceURL: resolved.url,
+                                mode: request.mode,
+                                thumbnailURL: result.thumbnailURL ?? resolved.thumbnailURL ?? entry.thumbnailURL,
+                                title: outputURLs.count == 1 ? result.songTitle ?? entry.title : url.deletingPathExtension().lastPathComponent,
+                                artist: result.artistName ?? entry.artist
+                            )
+                        }
                     } else {
                         failed += 1
                         appendLog(result.errorText)
                         updatePlaylistProgress(index, state: .failed, detail: summarizeFailure(result))
                     }
                 } catch {
+                    if error is CancellationError || cancellationRequested {
+                        cancellationRequested = true
+                        break
+                    }
                     failed += 1
                     appendLog("\n\(entry.displayName)：\(error.localizedDescription)\n")
                     updatePlaylistProgress(index, state: .failed, detail: error.localizedDescription)
@@ -551,10 +570,10 @@ final class DownloadStore {
             }
 
             isRunning = false
-            downloadProgress = 1
+            downloadProgress = cancellationRequested ? nil : 1
             let duplicateDetail = duplicates > 0 ? "，跳过 \(duplicates) 首重复" : ""
             progressDetail = "\(completed)/\(entries.count)\(duplicateDetail)"
-            statusMessage = failed == 0
+            statusMessage = cancellationRequested ? "已停止" : failed == 0
                 ? (duplicates > 0 ? "\(batchName)处理完成" : "\(batchName)下载完成")
                 : "\(batchName)部分失败"
             errorSummary = failed == 0 ? nil : "\(failed) 首下载失败，请查看日志。"
@@ -608,6 +627,7 @@ final class DownloadStore {
         }
 
         isRunning = true
+        cancellationRequested = false
         lastOutputURL = nil
         errorSummary = nil
         downloadProgress = nil
@@ -623,8 +643,10 @@ final class DownloadStore {
                         self?.appendLog(chunk)
                     }
                 }
+                if cancellationRequested { throw CancellationError() }
 
-                let outputURL = result.finalURL
+                let outputURLs = result.finalURLs
+                let outputURL = outputURLs.last
                 lastOutputURL = outputURL
                 isRunning = false
                 statusMessage = result.succeeded ? "下载完成" : "下载失败"
@@ -633,30 +655,53 @@ final class DownloadStore {
                 appendLog(result.errorText)
                 errorSummary = result.succeeded ? nil : summarizeFailure(result)
 
-                records.insert(DownloadRecord(
-                    title: outputURL?.lastPathComponent ?? request.url,
-                    url: request.url,
-                    outputURL: outputURL,
-                    mode: request.mode,
-                    startedAt: startedAt,
-                    succeeded: result.succeeded
-                ), at: 0)
-
-                if result.succeeded, let outputURL {
-                    addToLibrary(
-                        fileURL: outputURL,
-                        sourceURL: request.url,
+                let completedURLs = result.succeeded ? outputURLs : []
+                if completedURLs.isEmpty {
+                    records.insert(DownloadRecord(
+                        title: request.url,
+                        url: request.url,
+                        outputURL: nil,
                         mode: request.mode,
-                        thumbnailURL: result.thumbnailURL ?? request.thumbnailURL,
-                        title: result.songTitle,
-                        artist: result.artistName
-                    )
+                        startedAt: startedAt,
+                        succeeded: result.succeeded
+                    ), at: 0)
+                } else {
+                    for url in completedURLs.reversed() {
+                        records.insert(DownloadRecord(
+                            title: url.lastPathComponent,
+                            url: request.url,
+                            outputURL: url,
+                            mode: request.mode,
+                            startedAt: startedAt,
+                            succeeded: true
+                        ), at: 0)
+                    }
+                }
+
+                if result.succeeded, !outputURLs.isEmpty {
+                    for url in outputURLs {
+                        addToLibrary(
+                            fileURL: url,
+                            sourceURL: request.url,
+                            mode: request.mode,
+                            thumbnailURL: result.thumbnailURL ?? request.thumbnailURL,
+                            title: outputURLs.count == 1 ? result.songTitle : url.deletingPathExtension().lastPathComponent,
+                            artist: result.artistName
+                        )
+                    }
                     if playWhenFinished {
                         selectedSection = .player
                     }
                 }
             } catch {
                 isRunning = false
+                if error is CancellationError || cancellationRequested {
+                    statusMessage = "已停止"
+                    downloadProgress = nil
+                    progressDetail = ""
+                    errorSummary = nil
+                    return
+                }
                 statusMessage = "下载失败"
                 downloadProgress = nil
                 progressDetail = ""
@@ -940,6 +985,7 @@ final class DownloadStore {
     }
 
     func cancelDownload() {
+        cancellationRequested = true
         service.cancel()
         isRunning = false
         isAudioQualityUpgradeRunning = false

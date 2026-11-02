@@ -1,18 +1,16 @@
-# Hennessy 1.7.20
+# Hennessy 1.7.21
 
-This release restores downloadable installers on GitHub Releases.
+This macOS release fixes playlist downloads, protects unreadable library data, and reports cancellation correctly. The Android companion app has been retired; future releases provide the macOS package only.
 
 ## Highlights
 
-- Download the macOS DMG directly from the release assets.
-- Download the Android arm64 APK directly from the release assets.
-- Use `SHA256SUMS.txt` to verify either package after downloading.
-- Future tagged releases build, test, validate, and upload both installers automatically.
+- Playlist downloads now retain and import each downloaded media file.
+- Corrupt library JSON is preserved instead of being overwritten by an empty library.
+- Cancelled downloads stop cleanly and are not recorded as failures.
+- Search output is drained from stdout and stderr concurrently to prevent pipe deadlocks.
+- GitHub Releases provide the macOS DMG with a SHA-256 checksum file.
 
 ## Signing notice
 
 - The macOS DMG contains an ad-hoc signed app and is not Apple-notarized. macOS may require explicit approval in Privacy & Security on first launch.
-- The Android arm64 package uses the standard Debug signing key and is intended for direct testing rather than Play Store distribution.
-- The macOS package does not bundle `yt-dlp` or FFmpeg executables; downloading media still requires separately installed compatible tools.
-
-Application behavior is unchanged from 1.7.19.
+- The macOS package does not bundle `yt-dlp` or FFmpeg executables; downloading media requires separately installed compatible tools.

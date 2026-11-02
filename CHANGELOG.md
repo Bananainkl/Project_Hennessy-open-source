@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.7.21 (191) - 2026-11-02
+
+- Fixed playlist downloads to keep uniquely named media files and add every completed item to the library.
+- Preserved damaged library data by refusing to overwrite an unreadable library file.
+- Distinguished cancelled downloads from failures and drained search process output streams concurrently.
+- Retired the Android app and removed Android builds from future releases.
+
 ## 1.7.20 (190) - 2026-08-12
 
 - Added automatic macOS DMG and Android arm64 APK builds to tagged GitHub Releases.

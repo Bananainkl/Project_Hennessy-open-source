@@ -141,29 +141,64 @@ final class MediaSearchService: Sendable {
         ]
         process.environment = ProcessEnvironment.downloader
 
-        let stdout = Pipe()
-        let stderr = Pipe()
-        process.standardOutput = stdout
-        process.standardError = stderr
-
+        let captured: (output: Data, errorOutput: Data)
         do {
-            try process.run()
+            captured = try Self.captureOutput(from: process)
         } catch {
             throw MediaSearchError.launchFailed(error.localizedDescription)
         }
 
-        let outputData = stdout.fileHandleForReading.readDataToEndOfFile()
-        let errorData = stderr.fileHandleForReading.readDataToEndOfFile()
-        process.waitUntilExit()
-
-        let output = String(data: outputData, encoding: .utf8) ?? ""
-        let errorOutput = String(data: errorData, encoding: .utf8) ?? ""
+        let output = String(data: captured.output, encoding: .utf8) ?? ""
+        let errorOutput = String(data: captured.errorOutput, encoding: .utf8) ?? ""
 
         guard process.terminationStatus == 0 else {
             throw MediaSearchError.commandFailed(errorOutput.trimmingCharacters(in: .whitespacesAndNewlines))
         }
 
         return output
+    }
+
+    static func captureOutput(from process: Process) throws -> (output: Data, errorOutput: Data) {
+        let stdout = Pipe()
+        let stderr = Pipe()
+        process.standardOutput = stdout
+        process.standardError = stderr
+
+        let output = LockedDataBuffer()
+        let errorOutput = LockedDataBuffer()
+        let readers = DispatchGroup()
+        readers.enter()
+        DispatchQueue.global(qos: .utility).async {
+            output.data = stdout.fileHandleForReading.readDataToEndOfFile()
+            readers.leave()
+        }
+        readers.enter()
+        DispatchQueue.global(qos: .utility).async {
+            errorOutput.data = stderr.fileHandleForReading.readDataToEndOfFile()
+            readers.leave()
+        }
+
+        do {
+            try process.run()
+        } catch {
+            stdout.fileHandleForReading.closeFile()
+            stderr.fileHandleForReading.closeFile()
+            readers.wait()
+            throw error
+        }
+        process.waitUntilExit()
+        readers.wait()
+        return (output.data, errorOutput.data)
+    }
+}
+
+private final class LockedDataBuffer: @unchecked Sendable {
+    private let lock = NSLock()
+    private var storage = Data()
+
+    var data: Data {
+        get { lock.withLock { storage } }
+        set { lock.withLock { storage = newValue } }
     }
 }
 

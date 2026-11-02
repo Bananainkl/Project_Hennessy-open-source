@@ -37,6 +37,22 @@ struct DownloadResult: Equatable {
     }
 
     var finalURL: URL? {
+        finalURLs.last ?? legacyFinalURL
+    }
+
+    var finalURLs: [URL] {
+        let completedURLs = outputText
+            .split(whereSeparator: \.isNewline)
+            .compactMap { line -> URL? in
+                guard line.hasPrefix("下载完成：") else { return nil }
+                let path = line.dropFirst("下载完成：".count).trimmingCharacters(in: .whitespacesAndNewlines)
+                guard path.hasPrefix("/") else { return nil }
+                return URL(fileURLWithPath: path)
+            }
+        return completedURLs.isEmpty ? legacyFinalURL.map { [$0] } ?? [] : completedURLs
+    }
+
+    private var legacyFinalURL: URL? {
         let merged = outputText
             .split(whereSeparator: \.isNewline)
             .map(String.init)

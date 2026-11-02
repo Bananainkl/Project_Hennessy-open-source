@@ -1,6 +1,6 @@
 # Development Workflow
 
-Use `main` as the stable branch. Do not commit packaged apps, DMGs, APKs, local audit captures, build caches, credentials, or downloaded media.
+Use `main` as the stable branch. Do not commit packaged apps, DMGs, local audit captures, build caches, credentials, or downloaded media.
 
 ## Local verification
 
@@ -8,8 +8,6 @@ Use `main` as the stable branch. Do not commit packaged apps, DMGs, APKs, local 
 swift test
 ./script/build_and_run.sh --verify
 ```
-
-The Android build instructions are in `android-app/README.md`.
 
 ## Submit a change
 

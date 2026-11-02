@@ -17,10 +17,5 @@ ffmpeg
 - Build configuration and license text can be inspected with `ffmpeg -version`
   and `ffmpeg -L`. See https://ffmpeg.org/legal.html before redistribution.
 
-Android
-- youtubedl-android library and ffmpeg artifacts: 0.18.1
-- Project: https://github.com/yausername/youtubedl-android
-- License: GNU General Public License v3.0
-
 The app prepends Contents/Resources/Tools to PATH at runtime, then falls back
 to common Homebrew and system paths.

@@ -26,13 +26,17 @@ enum DownloaderError: LocalizedError {
 final class DownloaderService: @unchecked Sendable {
     private let processLock = NSLock()
     private var activeProcess: Process?
+    private var cancelledProcessIDs = Set<ObjectIdentifier>()
     private let fileManager = FileManager.default
     private let audioQualityService = AudioQualityService()
 
     func cancel() {
         processLock.lock()
         defer { processLock.unlock() }
-        activeProcess?.terminate()
+        if let activeProcess {
+            cancelledProcessIDs.insert(ObjectIdentifier(activeProcess))
+            activeProcess.terminate()
+        }
         activeProcess = nil
     }
 
@@ -61,7 +65,7 @@ final class DownloaderService: @unchecked Sendable {
         let tempDirectory = try makeTemporaryDirectory()
         defer { try? fileManager.removeItem(at: tempDirectory) }
 
-        let outputTemplate = tempDirectory.appendingPathComponent("media.%(ext)s").path
+        let outputTemplate = Self.outputTemplate(in: tempDirectory)
         var arguments = downloadArguments(for: request.mode, outputTemplate: outputTemplate)
         if !request.allowPlaylist {
             arguments.append("--no-playlist")
@@ -73,30 +77,36 @@ final class DownloaderService: @unchecked Sendable {
             return downloadResult
         }
 
-        let sourceURL = try newestMediaFile(in: tempDirectory, mode: request.mode)
-        let finalURL: URL
-        if request.mode == .videoMP4 {
-            finalURL = try await convertToPlayableMP4(
-                sourceURL: sourceURL,
-                destinationURL: uniqueURL(request.outputDirectory.appendingPathComponent("\(metadata.fileStem).mp4")),
-                onOutput: onOutput
-            )
-        } else {
-            let destination = uniqueURL(request.outputDirectory.appendingPathComponent("\(metadata.fileStem).\(finalExtension(for: request.mode, sourceURL: sourceURL))"))
-            try fileManager.moveItem(at: sourceURL, to: destination)
-            finalURL = destination
-        }
+        let sourceURLs = try mediaFiles(in: tempDirectory, mode: request.mode)
+        var finalURLs: [URL] = []
+        for sourceURL in sourceURLs {
+            try Task.checkCancellation()
+            let itemStem = sourceURLs.count == 1 ? metadata.fileStem : sourceURL.deletingPathExtension().lastPathComponent
+            let finalURL: URL
+            if request.mode == .videoMP4 {
+                finalURL = try await convertToPlayableMP4(
+                    sourceURL: sourceURL,
+                    destinationURL: uniqueURL(request.outputDirectory.appendingPathComponent("\(itemStem).mp4")),
+                    onOutput: onOutput
+                )
+            } else {
+                let destination = uniqueURL(request.outputDirectory.appendingPathComponent("\(itemStem).\(finalExtension(for: request.mode, sourceURL: sourceURL))"))
+                try fileManager.moveItem(at: sourceURL, to: destination)
+                finalURL = destination
+            }
 
-        onOutput("\(finalURL.path)\n")
-        onOutput("下载完成：\(finalURL.path)\n")
-        if request.mode == .bestAudio || request.mode == .mp3,
-           let quality = try? await audioQualityService.inspect(fileURL: finalURL) {
-            onOutput("文件核验：\(quality.qualityDescription)\n")
+            finalURLs.append(finalURL)
+            onOutput("\(finalURL.path)\n")
+            onOutput("下载完成：\(finalURL.path)\n")
+            if request.mode == .bestAudio || request.mode == .mp3,
+               let quality = try? await audioQualityService.inspect(fileURL: finalURL) {
+                onOutput("文件核验：\(quality.qualityDescription)\n")
+            }
         }
 
         return DownloadResult(
             exitCode: 0,
-            outputText: downloadResult.outputText + "\n\(finalURL.path)\n下载完成：\(finalURL.path)\n",
+            outputText: downloadResult.outputText + "\n" + finalURLs.map { "\($0.path)\n下载完成：\($0.path)" }.joined(separator: "\n"),
             errorText: downloadResult.errorText,
             thumbnailURL: metadata.thumbnailURL ?? request.thumbnailURL,
             songTitle: metadata.song,
@@ -179,19 +189,25 @@ final class DownloaderService: @unchecked Sendable {
         return directory
     }
 
-    private func newestMediaFile(in directory: URL, mode: DownloadMode) throws -> URL {
+    func mediaFiles(in directory: URL, mode: DownloadMode) throws -> [URL] {
         let urls = try fileManager.contentsOfDirectory(
             at: directory,
             includingPropertiesForKeys: [.contentModificationDateKey, .isRegularFileKey],
             options: [.skipsHiddenFiles]
         )
+        let mediaExtensions: Set<String>
+        switch mode {
+        case .bestAudio:
+            mediaExtensions = ["aac", "alac", "flac", "m4a", "mka", "mp3", "ogg", "opus", "wav", "webm"]
+        case .mp3:
+            mediaExtensions = ["mp3"]
+        case .video, .videoMP4:
+            mediaExtensions = ["avi", "flv", "m4v", "mkv", "mov", "mp4", "mpeg", "mpg", "ts", "webm"]
+        }
         let candidates = urls.filter { url in
             let ext = url.pathExtension.lowercased()
-            guard !["part", "ytdl", "json"].contains(ext) else { return false }
-            if mode == .mp3 {
-                return ext == "mp3"
-            }
-            return true
+            let isRegularFile = (try? url.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true
+            return isRegularFile && mediaExtensions.contains(ext)
         }
 
         let sorted = try candidates.sorted { left, right in
@@ -200,10 +216,14 @@ final class DownloaderService: @unchecked Sendable {
             return leftDate > rightDate
         }
 
-        guard let newest = sorted.first else {
+        guard !sorted.isEmpty else {
             throw DownloaderError.missingOutputFile
         }
-        return newest
+        return sorted
+    }
+
+    static func outputTemplate(in directory: URL) -> String {
+        directory.appendingPathComponent("%(id)s-%(title).160B.%(ext)s").path
     }
 
     private func finalExtension(for mode: DownloadMode, sourceURL: URL) -> String {
@@ -292,7 +312,7 @@ final class DownloaderService: @unchecked Sendable {
         }
     }
 
-    private func runProcess(
+    func runProcess(
         arguments: [String],
         onOutput: (@Sendable (String) -> Void)?
     ) async throws -> DownloadResult {
@@ -332,11 +352,15 @@ final class DownloaderService: @unchecked Sendable {
                 standardOutput.fileHandleForReading.readabilityHandler = nil
                 standardError.fileHandleForReading.readabilityHandler = nil
                 self?.processLock.lock()
-                if self?.activeProcess === finishedProcess {
-                    self?.activeProcess = nil
-                }
+                let processID = ObjectIdentifier(finishedProcess)
+                let wasCancelled = self?.cancelledProcessIDs.remove(processID) != nil
+                if self?.activeProcess === finishedProcess { self?.activeProcess = nil }
                 self?.processLock.unlock()
 
+                if wasCancelled {
+                    continuation.resume(throwing: CancellationError())
+                    return
+                }
                 continuation.resume(returning: DownloadResult(
                     exitCode: finishedProcess.terminationStatus,
                     outputText: outputBuffer.stringValue,
@@ -350,10 +374,9 @@ final class DownloaderService: @unchecked Sendable {
             do {
                 processLock.lock()
                 activeProcess = process
-                processLock.unlock()
                 try process.run()
+                processLock.unlock()
             } catch {
-                processLock.lock()
                 activeProcess = nil
                 processLock.unlock()
                 continuation.resume(throwing: DownloaderError.launchFailed(error.localizedDescription))

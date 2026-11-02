@@ -24,6 +24,12 @@ APP_BINARY="$APP_MACOS/$APP_NAME"
 INFO_PLIST="$APP_CONTENTS/Info.plist"
 APP_ICON="$ROOT_DIR/Assets/AppIcon/Hennessy.icns"
 APP_TOOLS="$ROOT_DIR/Assets/Tools"
+BUNDLE_EXTERNAL_TOOLS="${BUNDLE_EXTERNAL_TOOLS:-1}"
+
+if [[ "$BUNDLE_EXTERNAL_TOOLS" != "0" && "$BUNDLE_EXTERNAL_TOOLS" != "1" ]]; then
+  echo "BUNDLE_EXTERNAL_TOOLS must be 0 or 1" >&2
+  exit 2
+fi
 
 cd "$ROOT_DIR"
 
@@ -42,7 +48,7 @@ if [[ -f "$APP_ICON" ]]; then
   cp "$APP_ICON" "$APP_RESOURCES/Hennessy.icns"
 fi
 
-if [[ -d "$APP_TOOLS" ]]; then
+if [[ "$BUNDLE_EXTERNAL_TOOLS" == "1" && -d "$APP_TOOLS" ]]; then
   mkdir -p "$APP_RESOURCES/Tools"
   ditto "$APP_TOOLS" "$APP_RESOURCES/Tools"
   chmod -R a+rX "$APP_RESOURCES/Tools"
